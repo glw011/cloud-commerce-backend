@@ -1,25 +1,25 @@
 # OrderFlow
 
-## 1. Summary
+---
 
-### 1.1 Project Goal: 
+### Project Goal: 
 
-Build a realistic backend platform demonstrating clean API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation.
+  Build a realistic backend platform demonstrating clean API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation.
 
-### 1.2 Project Summary:
+### Project Summary:
 
 OrderFlow is a backend platform for small e-commerce operations aimed at providing administrative product management for businesses and customers using role-based access. 
 
-Manages:
+_OrderFlow manages_:
 - Products and inventory
 - Customers 
 - Orders
 - Order items
 - Inventory reservations
-- Payments (simulated currently)
+- Payments (currently simulated)
 - Order fulfillment status  
 
-OrderFlow also includes API & cloud deployment documentation and offers:
+_OrderFlow offers_:
 - Transaction safety
 - Inventory consistency
 - API validation
@@ -29,7 +29,9 @@ OrderFlow also includes API & cloud deployment documentation and offers:
 - Testing
 - Observability
 
-## 2. Tech Stack
+## Tech Stack
+
+---
 
 **Core stack**: 
   - _Language_: Java `21` 
@@ -48,9 +50,11 @@ OrderFlow also includes API & cloud deployment documentation and offers:
   - _Documentation_: OpenAPI/Swagger 
   - _Metrics_: Spring Boot Actuator
 
-## 3. Planned Architecture
+## Planned Architecture
 
-### 3.1 System Architecture
+---
+
+### System Architecture
 
 ```text
 Client/Postman/Swagger UI
@@ -69,7 +73,7 @@ Spring Boot REST API
         +--> Actuator Health Checks
 ```
 
-### 3.2 Cloud Architecture
+### Cloud Architecture
 
 ```text
 Internet
@@ -95,10 +99,90 @@ ECS Fargate Service
 
 ## 4. Planned Features
 
+---
+
 ## 5. Local Setup
 
-## 6. Testing
+---
 
-## 7. Deployment
+### Requirements 
+  - JDK 21, 
+  - Docker Desktop (running), 
+  - Git
 
-## 8. Demo Credentials
+### Quick Setup
+  From project root:
+```bash
+cp .env.example .env 
+cp ./src/main/resources/application-local.yml.example ./src/main/resources/application-local.yml
+docker compose up -d
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+curl http://localhost:8080/actuator/health  # use separate terminal
+docker compose down
+```
+
+### Instructions
+
+1. **Clone repository**:
+   ```bash
+   git clone https://www.github.com/glw011/cloud-commerce-backend
+   ```
+   <br/>
+
+2. **Navigate to local project directory root**:
+   ```bash
+   cd /path/to/your/directory/   
+   ```
+   <br/>
+
+3. **Copy '`.env.example`' & create local '`.env`' file**:
+   ```bash
+   cp .env.example .env 
+   ```
+   <br/>
+
+4. **Copy example config file & create '`application-local.yml`'**:
+   ```bash
+   cp ./src/main/resources/application-local.yml.example ./src/main/resources/application-local.yml 
+   ```
+   _Changing secret in `application-local.yml` *recommended* but defaults will work._
+   <br/>
+   <br/>
+
+5. **Start PostgreSQL and Redis**:
+   ```bash
+   docker compose up -d
+   ```
+   <br/>
+
+6. **Start application using local profile**:
+   ```bash
+   ./mvnw spring-boot:run -Dspring-boot.run.profiles=local 
+   ```
+   <br/>
+
+7. **Confirm successful setup using a separate terminal**:
+
+   ```bash
+   curl http://localhost:8080/actuator/health 
+   ```
+   <br/>
+
+8. **Stop services when done**:
+   ```bash
+   docker compse down 
+   ```
+   <br/>
+
+
+## Testing
+
+---
+
+## Deployment
+
+---
+
+## Demo Credentials
+
+---

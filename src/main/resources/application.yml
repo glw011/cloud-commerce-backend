@@ -4,7 +4,7 @@ spring:
   jpa:
     open-in-view:
     hibernate:
-      ddl-auto: validate         # hibernate just validates mappings
+      ddl-auto: validate         # hibernate only validates mappings
     properties:
       hibernate:
         format_sql: true
