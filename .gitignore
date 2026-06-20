@@ -1,12 +1,36 @@
+# ===== Maven =====
+target/
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
 
-# ===== Build outputs =====
-dist/
+# ===== Gradle =====
+.gradle/
 build/
-out/
-.next/
-.nuxt/
-.cache/
-*.tsbuildinfo
+!gradle/wrapper/gradle-wrapper.jar
+
+# ===== Java =====
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# ===== Spring Boot =====
+spring.log
+application-local.yml
+application-dev.yml
+application-prod.yml
+application-test.yml
+application-secrets.yml
+application-*.local.yml
 
 # ===== Environment & secrets =====
 .env
@@ -14,6 +38,28 @@ out/
 !.env.example
 *.pem
 *.key
+*.crt
+*.p12
+*.jks
+secrets/
+credentials/
+aws-credentials/
+.jwt-secret
+
+# ===== Database =====
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+
+# ===== Redis =====
+dump.rdb
+appendonly.aof
+
+# ===== OpenAPI =====
+openapi/generated/
+generated-sources/
+generated-test-sources/
 
 # ===== Dev notes =====
 docs/notes/
@@ -21,21 +67,37 @@ docs/notes/
 # ===== Logs =====
 *.log
 logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # ===== Testing =====
 coverage/
+htmlcov/
+surefire-reports/
+failsafe-reports/
+jacoco.exec
+jacoco-ut.exec
+jacoco-it.exec
+.testcontainers.properties
 
 # ===== OS =====
 .DS_Store
 .DS_Store?
 ._*
-Thumbs.db
-ehthumbs.db
 Desktop.ini
 
 # ===== IDEs =====
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache/
 .idea/
+*.iws
 *.iml
+*.ipr
+out/
 .vscode/
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -43,8 +105,19 @@ Desktop.ini
 *.swo
 *~
 
-# ===== AWS / Cloud =====
-.aws/
+# ===== AWS =====
+.aws-sam/
+cdk.out/
+terraform/
+terraform.tfstate
+terraform.tfstate.*
+terraform.lock.hcl
+*.tfvars
+*.tfvars.json
 
-# ===== Misc =====
+# ===== Temp & Misc =====
 *.local
+tmp/
+temp/
+*.tmp
+
