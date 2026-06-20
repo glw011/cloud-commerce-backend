@@ -1,14 +1,7 @@
-## Cloud-Native Order & Inventory Microservice Platform Roadmap
+## Project Goals
+**Create backend platform for a small e-commerce operation**
 
-**Stack:** Java, Spring Boot, PostgreSQL, Redis, Docker, AWS, GitHub Actions, RESTful API design  
-**Goal:** Build a realistic backend platform demonstrating production-ready API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation
-
----
-
-## 1. Project Summary
-
-Build backend platform for small e-commerce operation managing:
-
+### _Managing_:
 - Products and inventory
 - Customers
 - Orders
@@ -21,8 +14,7 @@ Build backend platform for small e-commerce operation managing:
 - API documentation
 - Cloud deployment
 
-Demonstrates:
-
+### _Demonstrating_:
 - Correct data modeling
 - Transaction safety
 - Inventory consistency
@@ -38,11 +30,9 @@ Demonstrates:
 
 ---
 
-## 2. Tech Stack
-
-### Core Backend
-
-| Area | Technology |
+## Tech Stack
+### _Core Backend_
+| _Area_ | _Technology_ |
 |---|---|
 | Language | Java 21 LTS |
 | Framework | Spring Boot 4.x or Spring Boot 3.5.x |
@@ -65,8 +55,7 @@ Demonstrates:
 | Logs | CloudWatch Logs |
 | Metrics | Spring Boot Actuator |
 
-### Versions
-
+### _Versions_
 - Java 21 LTS
 - Spring Boot 4.1.0
 - PostgreSQL 16+
@@ -75,43 +64,38 @@ Demonstrates:
 
 ---
 
-## 3. Deliverables
+## TODO Checklist
 
-By the end, your project should include:
-
-1. Public GitHub repository
-2. Professional README
-3. Architecture diagram
-4. Entity relationship diagram
-5. OpenAPI/Swagger documentation
-6. Docker Compose setup
-7. PostgreSQL migrations
-8. Authentication and authorization
-9. Unit tests
-10. Integration tests
-11. Testcontainers database tests
-12. GitHub Actions workflow
-13. AWS deployment instructions
-14. Live deployed API
-15. Example API request collection
-16. Resume bullet points
-17. Short demo video or GIF
-18. `/docs` folder explaining design decisions
+- [x] ~~Public GitHub repository~~
+- [ ] Professional README
+- [ ] Architecture diagram
+- [ ] Entity relationship diagram
+- [ ] OpenAPI/Swagger documentation
+- [x] ~~Docker Compose setup~~
+- [x] ~~PostgreSQL migrations~~
+- [ ] Authentication and authorization
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Testcontainers database tests
+- [ ] GitHub Actions workflow
+- [ ] AWS deployment instructions
+- [ ] Live deployed API
+- [ ] Example API request collection
+- [ ] Resume bullet points
+- [ ] Short demo video
+- [ ] `/docs` explain design decisions
 
 ---
 
-## 4. Repository
-
+## Repository
 ```text
 https://github.com/glw011/cloud-commerce-backend
 ```
 
 ---
 
-## 5. System Architecture
-
-### MVP Architecture
-
+## Architecture
+### _MVP_
 ```text
 Client/Postman/Swagger UI
         |
@@ -129,8 +113,7 @@ Spring Boot REST API
         +--> Actuator Health Checks
 ```
 
-### Cloud Architecture
-
+### _Cloud_
 ```text
 Internet
    |
@@ -154,167 +137,139 @@ ECS Fargate Service
 ```
 
 ---
+<br>
 
-## 6. Domain Model
+## Entities
+### _User_ 
+> _Represents an authenticated system user_
 
-### Main Entities
+**User Fields**:
+1. `id`
+2. `email`
+3. `password_hash`
+4. `role`
+5. `created_at`
+6. `updated_at`
 
-#### User
+**User Roles**:
+1. `CUSTOMER`
+2. `ADMIN`
+3. `WAREHOUSE_MANAGER`
 
-Represents: _Authenticated system user_
+### _Customer_
+> _Represents a customer & their profile information_
 
-Fields:
+**Customer Fields**:
+1. `id`
+2. `user_id`
+3. `first_name`
+4. `last_name`
+5. `phone`
+6. `created_at`
+7. `updated_at`
 
-- `id`
-- `email`
-- `passwordHash`
-- `role`
-- `createdAt`
-- `updatedAt`
+### _Product_
+> _Represents an item in the OrderFlow system_
 
-Roles:
+**Product Fields**:
+1. `id`
+2. `sku`
+3. `name`
+4. `description`
+5. `price`
+6. `active`
+7. `created_at`
+8. `updated_at`
 
-- `CUSTOMER`
-- `ADMIN`
-- `WAREHOUSE_MANAGER`
+### _Inventory Item_
+> _Represents a sellable product in the OrderFlow system_
 
-#### Customer
+**Inventory Item Fields**:
+1. `id`
+2. `product_id`
+3. `quantity_on_hand`
+4. `quantity_reserved`
+5. `reorder_threshold`
+6. `version`
+7. `updated_at`
 
-Represents: _Customer profile info_
+> **NOTE**: Orders cannot reserve more than is available and use an optimistic locking strategy via `version` field
 
-Fields:
+### _Order_
+> _Represents an order from a customer_
 
-- `id`
-- `userId`
-- `firstName`
-- `lastName`
-- `phone`
-- `createdAt`
-- `updatedAt`
+**Order Fields**:
+1. `id`
+2. `customer_id`
+3. `status`
+4. `subtotal`
+5. `tax`
+6. `total`
+7. `created_at`
+8. `updated_at`
 
-#### Product
+**Order Statuses**:
+1. `PENDING`
+2. `RESERVED`
+3. `PAID`
+4. `FULFILLING`
+5. `SHIPPED`
+6. `CANCELED`
+7. `FAILED`
 
-Represents: _Sellable inventory item_
+### _Order Item_
+> _Represents a product line within an order_
 
-Fields:
+**Fields**:
+1. `id`
+2. `order_id`
+3. `product_id`
+4. `quantity`
+5. `unit_price`
+6. `line_total`
 
-- `id`
-- `sku`
-- `name`
-- `description`
-- `price`
-- `active`
-- `createdAt`
-- `updatedAt`
+### _Inventory Reservation_
+> _Represents an inventory item reserved for an order_
 
-#### InventoryItem
+**Inventory Reservation Fields**:
+1. `id`
+2. `order_id`
+3. `product_id`
+4. `quantity`
+5. `status`
+6. `expires_at`
+7. `created_at`
 
-Represents: _Available stock for product_
+**Inventory Reservation Statuses**:
+1. `ACTIVE`
+2. `RELEASED`
+3. `CONSUMED`
+4. `EXPIRED`
 
-Fields:
+### _Payment_
+> _Represents (simulated) transaction for an order_
 
-- `id`
-- `productId`
-- `quantityOnHand`
-- `quantityReserved`
-- `reorderThreshold`
-- `version`
-- `updatedAt`
+**Payment Fields**:
+1. `id`
+2. `order_id`
+3. `provider`
+4. `status`
+5. `amount`
+6. `transaction_reference`
+7. `created_at`
 
-NOTE:
-
-- Use optimistic locking with `version` column
-- Prevent orders from reserving more than available
-
-#### Order
-
-Represents: _Customer order_
-
-Fields:
-
-- `id`
-- `customerId`
-- `status`
-- `subtotal`
-- `tax`
-- `total`
-- `createdAt`
-- `updatedAt`
-
-Statuses:
-
-- `PENDING`
-- `RESERVED`
-- `PAID`
-- `FULFILLING`
-- `SHIPPED`
-- `CANCELLED`
-- `FAILED`
-
-#### OrderItem
-
-Represents: _Product line within an order_
-
-Fields:
-
-- `id`
-- `orderId`
-- `productId`
-- `quantity`
-- `unitPrice`
-- `lineTotal`
-
-#### InventoryReservation
-
-Represents: _Reserved inventory for an order_
-
-Fields:
-
-- `id`
-- `orderId`
-- `productId`
-- `quantity`
-- `status`
-- `expiresAt`
-- `createdAt`
-
-Statuses:
-
-- `ACTIVE`
-- `RELEASED`
-- `CONSUMED`
-- `EXPIRED`
-
-#### Payment
-
-Represents: _Simulated transaction_
-
-Fields:
-
-- `id`
-- `orderId`
-- `provider`
-- `status`
-- `amount`
-- `transactionReference`
-- `createdAt`
-
-Statuses:
-
-- `PENDING`
-- `AUTHORIZED`
-- `CAPTURED`
-- `FAILED`
-- `REFUNDED`
+**Payment Statuses**:
+1. `PENDING`
+2. `AUTHORIZED`
+3. `CAPTURED`
+4. `FAILED`
+5. `REFUNDED`
 
 ---
 
-## 7. DB Roadmap
+## Database
 
-### Phase 1 - Tables
-
-Create migrations for:
-
+### _Tables_
 1. `users`
 2. `customers`
 3. `products`
@@ -324,34 +279,55 @@ Create migrations for:
 7. `inventory_reservations`
 8. `payments`
 
-### Constraints
+### _Constraints_
+| _Constraint_ | _Name_ | _Table_ |
+|---|---|---|
+| Unique user emails | `uq_users_email` | `users` |
+| Unique customer user ids | `uq_customers_user` | `customers` |
+| Unique product SKUs | `uq_products_sku` | `products` |
+| Product price > 0 | `ck_products_price_gt_zero` | `products` |
+| Unique inventory items | `uq_inventory_product` | `inventory_items` |
+| Inventory quantity >= 0 | `ck_inventory_on_hand_gte_zero` | `inventory_items` |
+| Reserved quantity >= 0 | `ck_inventory_reserved_gte_zero` | `inventory_items` |
+| Reserved quantity <= Inventory quantity | `ck_inventory_reserved_lte_on_hand` | `inventory_items` |
+| User role validation | `ck_users_role` | `users` |
+| Order status validation | `ck_orders_status` | `orders` |
+| Order item quantity > 0 | `ck_order_items_qty_gt_zero` | `order_items` |
+| Unique order items in orders | `uq_order_items_order_products` | `order_items` |
+| Reservation quantity > 0 | `ck_reservations_qty_gt_zero` | `inventory_reservations` |
+| Reservation status validation | `ck_reservations_status` | `inventory_reservations` |
+| Payment amount >= 0 | `ck_payments_amount_gte_zero` | `payments` |
+| Payment status validation | `ck_payments_status` | `payments` |
 
-Add constraints for:
+### _Foreign Keys_
+| _Table_ | _Foreign Key_ | _Reference Field/Table_ | _FK Name_ |
+|---|---|---|---|
+| `customers` | `user_id` | `id` in `users` | `fk_customers_user` |
+| `inventory_items` | `product_id` | `id` in `products` | `fk_inventory_product` |
+| `orders` | `customer_id` | `id` in `customers` | `fk_orders_customer` |
+| `order_items` | `order_id` | `id` in `orders` | `fk_order_items_order` |
+| `order_items` | `product_id` | `id` in `products` | `fk_order_items_product` |
+| `inventory_reservations` | `order_id` | `id` in `orders` | `fk_reservations_order` |
+| `inventory_reservations` | `product_id` | `id` in `products` | `fk_reservations_product` |
+| `payments` | `order_id` | `id` in `orders` | `fk_payments_order` |
 
-- Unique user email
-- Unique product SKU
-- Product price > 0
-- Inventory quantity >= 0
-- Reserved quantity >= 0
-- Order status validation
-- Payment status validation
-- Foreign keys between related tables
+### _Indexes_
+| _Table_ | _Field_ | _Name_ |
+|---|---|---|
+| `orders` | `customer_id` | `idx_orders_customer_id` |
+| `orders` | `status` | `idx_orders_status` |
+| `orders` | `created_at` | `idx_orders_created_at` |
+| `inventory_reservations` | `order_id` | `idx_reservations_order_id` |
+| `inventory_reservations` | `product_id` | `idx_reservations_product_id` |
+| `payments` | `order_id` | `idx_payments_order_id` |
 
-### Indexes
-
-Add indexes for:
+##### Automatic Indexes (Unique):
 
 - `users.email`
 - `products.sku`
-- `orders.customer_id`
-- `orders.status`
-- `orders.created_at`
 - `inventory_items.product_id`
-- `inventory_reservations.order_id`
-- `inventory_reservations.product_id`
 
-### Migration Layout
-
+### _Migration Sequence_
 ```text
 src/main/resources/db/migration/
   V1__create_users_table.sql
@@ -366,7 +342,7 @@ src/main/resources/db/migration/
 
 ---
 
-## 8. API Design
+## 8. API
 
 ### Authentication Endpoints
 
