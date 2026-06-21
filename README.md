@@ -1,7 +1,5 @@
 # OrderFlow
 
----
-
 ### Project Goal: 
 
   Build a realistic backend platform demonstrating clean API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation.
@@ -29,9 +27,9 @@ _OrderFlow offers_:
 - Testing
 - Observability
 
-## Tech Stack
-
 ---
+
+## Tech Stack
 
 **Core stack**: 
   - _Language_: Java `21` 
@@ -50,9 +48,9 @@ _OrderFlow offers_:
   - _Documentation_: OpenAPI/Swagger 
   - _Metrics_: Spring Boot Actuator
 
-## Planned Architecture
-
 ---
+
+## Planned Architecture
 
 ### System Architecture
 
@@ -97,13 +95,13 @@ ECS Fargate Service
    +--> Secrets Manager/SSM Parameter Store
 ```
 
-## 4. Planned Features
+---
+
+## Planned Features
 
 ---
 
-## 5. Local Setup
-
----
+## Local Setup
 
 ### Requirements 
   - JDK 21, 
@@ -174,6 +172,7 @@ docker compose down
    ```
    <br/>
 
+---
 
 ## Testing
 
@@ -184,5 +183,11 @@ docker compose down
 ---
 
 ## Demo Credentials
+
+|   | _Login_ | _Password_ |
+|---|---|---|
+| <p align="center"> **_Customer_** </p> | <p align="right"> `customer@example.com` </p> | `CustomerPass123!` |
+| <p align="center"> **_Warehouse_**<br>**_Manager_** </p> | <p align="right"> `warehouse@example.com` </p> | `WarehousePass123!` |
+| <p align="center"> **_Admin_** </p> | <p align="right"> `admin@example.com` </p> | `AdminPass123!` |
 
 ---
