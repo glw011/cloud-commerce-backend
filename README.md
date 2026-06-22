@@ -8,7 +8,7 @@
 
 OrderFlow is a backend platform for small e-commerce operations aimed at providing administrative product management for businesses and customers using role-based access. 
 
-_OrderFlow manages_:
+***Manages***:
 - Products and inventory
 - Customers 
 - Orders
@@ -17,7 +17,7 @@ _OrderFlow manages_:
 - Payments (currently simulated)
 - Order fulfillment status  
 
-_OrderFlow offers_:
+***Includes***:
 - Transaction safety
 - Inventory consistency
 - API validation
@@ -32,21 +32,21 @@ _OrderFlow offers_:
 ## Tech Stack
 
 **Core stack**: 
-  - _Language_: Java `21` 
-  - _Framework_: Spring Boot `4.1.0`
-  - _Build Tool_: Maven 
-  - _Database_: PostgreSQL `16`
-  - _Migrations_: Flyway 
-  - _Cache_: Redis `7`
-  - _Auth_: Spring Security + JWT
-  - _Local Dev_: Docker Compose `v2`
-  - _CI/CD_: GitHub Actions
-  - _Deployment_: AWS ECS Fargate 
-  - _Hosting_: RDS PostgreSQL 
-  - _Container Registry_: ECR 
-  - _Logs_: CloudWatch Logs 
-  - _Documentation_: OpenAPI/Swagger 
-  - _Metrics_: Spring Boot Actuator
+  - _Language_: `Java 21` 
+  - _Framework_: `Spring Boot 4.1.0`
+  - _Build Tool_: `Maven` 
+  - _Database_: `PostgreSQL 16`
+  - _Migrations_: `Flyway` 
+  - _Cache_: `Redis 7`
+  - _Auth_: `Spring Security` + `JWT`
+  - _Local Dev_: `Docker Compose v2`
+  - _CI/CD_: `GitHub Actions`
+  - _Deployment_: `AWS ECS Fargate` 
+  - _Hosting_: `RDS PostgreSQL` 
+  - _Container Registry_: `ECR` 
+  - _Logs_: `CloudWatch Logs` 
+  - _Documentation_: `OpenAPI/Swagger` 
+  - _Metrics_: `Spring Boot Actuator`
 
 ---
 
