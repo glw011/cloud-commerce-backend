@@ -1,12 +1,9 @@
 package com.garrettw011.orderflow.common;
 
 import com.garrettw011.orderflow.common.exception.ResourceNotFoundException;
+import com.garrettw011.orderflow.support.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,13 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(GlobalExceptionHandlerTest.ProbeController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@Import({GlobalExceptionHandler.class, GlobalExceptionHandlerTest.ProbeController.class})
-class GlobalExceptionHandlerTest {
 
-    @Autowired MockMvc mvc;
-
+@Import(GlobalExceptionHandlerTest.ProbeController.class)
+class GlobalExceptionHandlerTest extends AbstractIntegrationTest {
     @RestController
     static class ProbeController {
         @GetMapping("/_probe/not-found")
@@ -29,7 +22,10 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void notFoundProducesApiErrorShape() throws Exception {
-        mvc.perform(get("/_probe/not-found"))
+        //String token = tokenFromLoginResp(loginResp(testCredentials));
+        String token = loginToken(testCredentials);
+
+        mvc.perform(get("/_probe/not-found").header("Authorization", "Bearer " + token))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
