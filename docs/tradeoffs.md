@@ -16,6 +16,8 @@
 
 ---
 
+<br>
+
 ## Global Exception Handler
 
 ### Catching `DataIntegrityViolationException` as `HTTP 409` Conflict Error
@@ -24,3 +26,25 @@
 > server-side while generic, preserving traceability without leaking stack traces.   
 
 ---
+
+<br>
+
+## Refresh Tokens
+
+> OrderFlow is stateless and stateless access tokens cannot be revoked once signed. To reduce exposure, a revocable  
+> refresh token is used instead. This refresh token lives server-side in Redis and only contains a random key, allowing 
+> access tokens to be rotated on use (and provides basic protection from reuse of stolen tokens)  
+
+---
+
+<br>
+
+## JSON Serializer (`jjwt-gson` Vs `jjwt-jackson`)
+
+> `jjwt-gson` is the serializer used internally by `jjwt`, so using `jjwt-gson` keeps JWT JSON handling completely 
+> self-contained and off the Jackson 3 stack
+
+---
+
+<br>
+
