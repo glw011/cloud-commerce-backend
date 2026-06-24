@@ -69,5 +69,22 @@ class AuthFlowTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.email").value("customer@example.com"))
                 .andExpect(jsonPath("$.role").value("CUSTOMER"));
     }
+
+    @Test
+    void customerCannotCreateProduct() throws Exception {
+        mvc.perform(post("/api/v1/products")
+                        .header("Authorization", bearer(token()))
+                        .contentType(appJson)
+                        .content(productBody("CUST-ITM-001", "Customer Item", "13.99")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void createWithNoTokenReturns401() throws Exception {
+        mvc.perform(post("/api/v1/products")
+                        .contentType(appJson)
+                        .content(productBody("ANON-ITM-001", "Anon Item", "1.00")))
+                .andExpect(status().isUnauthorized());
+    }
 }
 
