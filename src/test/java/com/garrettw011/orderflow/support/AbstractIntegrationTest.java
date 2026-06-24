@@ -54,5 +54,11 @@ public abstract class AbstractIntegrationTest {
         return tokenFromLoginResp(loginResp(credentials));
     }
 
+    protected String token() throws Exception { return tokenFromLoginResp(loginResp(testCredentials)); }
+
+    protected String tokenFor(String email, String password) throws Exception {
+        return tokenFromLoginResp(loginResp(formatCredentials(email, password)));
+    }
+
 }
 
