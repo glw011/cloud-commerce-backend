@@ -12,6 +12,8 @@ import org.testcontainers.utility.DockerImageName;
 import org.springframework.http.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
+import java.math.BigDecimal;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
@@ -54,5 +56,19 @@ public abstract class AbstractIntegrationTest {
         return tokenFromLoginResp(loginResp(credentials));
     }
 
+    protected String token() throws Exception { return tokenFromLoginResp(loginResp(testCredentials)); }
+
+    protected String tokenFor(String email, String password) throws Exception {
+        return tokenFromLoginResp(loginResp(formatCredentials(email, password)));
+    }
+
+    protected String adminToken() throws Exception { return tokenFor("admin@example.com", "AdminPass123!"); }
+
+    protected String bearer(String token) { return "Bearer " + token; }
+
+    protected String productBody(String sku, String name, String price) {
+        return """
+               {"sku":"%s","name":"%s","price":"%s"}""".formatted(sku, name, price);
+    }
 }
 
