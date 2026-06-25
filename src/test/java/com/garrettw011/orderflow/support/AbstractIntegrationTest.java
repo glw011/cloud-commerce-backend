@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 public abstract class AbstractIntegrationTest {
     @ServiceConnection
     static final PostgreSQLContainer POSTGRES =

@@ -13,7 +13,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 @Testcontainers
 class OrderflowApplicationTests {
 

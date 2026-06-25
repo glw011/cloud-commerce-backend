@@ -22,7 +22,6 @@ class GlobalExceptionHandlerTest extends AbstractIntegrationTest {
 
     @Test
     void notFoundProducesApiErrorShape() throws Exception {
-        //String token = tokenFromLoginResp(loginResp(testCredentials));
         String token = loginToken(testCredentials);
 
         mvc.perform(get("/_probe/not-found").header("Authorization", "Bearer " + token))
