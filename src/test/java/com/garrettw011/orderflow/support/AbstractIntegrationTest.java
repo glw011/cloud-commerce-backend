@@ -64,6 +64,8 @@ public abstract class AbstractIntegrationTest {
 
     protected String adminToken() throws Exception { return tokenFor("admin@example.com", "AdminPass123!"); }
 
+    protected String managerToken() throws Exception { return tokenFor("warehouse@example.com", "WarehousePass123!"); }
+
     protected String bearer(String token) { return "Bearer " + token; }
 
     protected String productBody(String sku, String name, String price) {
