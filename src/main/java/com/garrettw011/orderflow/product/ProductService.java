@@ -3,6 +3,7 @@ package com.garrettw011.orderflow.product;
 import com.garrettw011.orderflow.common.exception.DuplicateResourceException;
 import com.garrettw011.orderflow.common.exception.InvalidStateTransitionException;
 import com.garrettw011.orderflow.common.exception.ResourceNotFoundException;
+import com.garrettw011.orderflow.inventory.InventoryItem;
 import com.garrettw011.orderflow.inventory.InventoryRepository;
 import com.garrettw011.orderflow.order.OrderItemRepository;
 import com.garrettw011.orderflow.product.dto.*;
@@ -56,8 +57,16 @@ public class ProductService {
         p.setDescription(req.description());
         p.setPrice(req.price());
         p.setActive(req.active() == null || req.active());
+        products.save(p);
 
-        return toResponse(products.save(p));
+        InventoryItem item = new InventoryItem();
+        item.setProduct(p);
+        item.setQuantityOnHand(0);
+        item.setQuantityReserved(0);
+        item.setReorderThreshold(0);
+        inventory.save(item);
+
+        return toResponse(p);
     }
 
     @Transactional

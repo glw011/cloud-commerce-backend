@@ -48,3 +48,16 @@
 
 <br>
 
+## Changes needed to deploy at scale
+
+InventoryService:
+> mapping methods use item.getProduct() (lazy association) for SKU & name. Happens in @Transactional service method,
+> so it's safe,but at scale would be N+1 query on paginated list but for small number of products, isn't worth extra 
+> complexity
+
+> FIX: Use a 'JOIN FETCH' instead
+
+---
+
+<br>
+
