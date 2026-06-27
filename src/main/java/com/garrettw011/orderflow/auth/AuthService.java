@@ -14,17 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
+    private final RegistrationService registrationService;
     private final UserService userService;
-    private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProperties jwtProperties;
 
-    public AuthService(UserService userService, CustomerService customerService, PasswordEncoder passwordEncoder,
+    public AuthService(RegistrationService registrationService, UserService userService, CustomerService customerService, PasswordEncoder passwordEncoder,
                        JwtService jwtService, RefreshTokenService refreshTokenService, JwtProperties jwtProperties) {
+        this.registrationService = registrationService;
         this.userService = userService;
-        this.customerService = customerService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
@@ -37,14 +37,8 @@ public class AuthService {
         return new AuthResponse(access, refresh, "Bearer", jwtProperties.accessTokenTtl().toSeconds());
     }
 
-    @Transactional
     public AuthResponse register(RegisterRequest req) {
-        if (userService.emailExists(req.email())) {
-            throw new DuplicateResourceException("Email already associated with another profile.");
-        }
-
-        User user = userService.createUser(req.email(), req.password(), Role.CUSTOMER);
-        customerService.createProfile(user, req.firstName(), req.lastName(), req.phone());
+        User user = registrationService.registerCustomer(req);
         return issueTokens(user);
     }
 
