@@ -22,7 +22,7 @@ public class InventoryController {
     }
 
     @GetMapping
-    public PageResponse<InventoryResponse> list(@PageableDefault(size = 20) Pageable pageable) {
+    public PageResponse<InventoryResponse> list(Pageable pageable) {
         return PageResponse.from(service.getAll(pageable));
     }
 

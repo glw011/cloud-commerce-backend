@@ -24,7 +24,7 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String sku,
-            @PageableDefault(size = 20) Pageable pageable) {
+            Pageable pageable) {
 
         var params = new ProductSearchParams(active, minPrice,maxPrice, name, sku);
         return PageResponse.from(service.search(params, pageable));
