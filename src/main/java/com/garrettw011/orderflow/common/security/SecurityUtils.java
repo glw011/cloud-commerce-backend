@@ -14,7 +14,3 @@ public final class SecurityUtils {
         return Long.valueOf(auth.getName());
     }
 }
-
-
-
-
