@@ -1,5 +1,6 @@
 package com.garrettw011.orderflow.customer.dto;
 
+import org.jspecify.annotations.Nullable;
 import java.time.Instant;
 
 public record CustomerResponse(
@@ -7,7 +8,7 @@ public record CustomerResponse(
         String email,
         String firstName,
         String lastName,
-        String phone,
+        @Nullable String phone,
         Instant createdAt,
         Instant updatedAt
 ) {}
