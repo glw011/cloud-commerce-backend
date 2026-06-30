@@ -1,9 +1,11 @@
 package com.garrettw011.orderflow.product;
 
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -22,7 +24,7 @@ public class Product {
     private String name;
 
     @Column(columnDefinition = "text")
-    private String description;
+    private @Nullable String description;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;

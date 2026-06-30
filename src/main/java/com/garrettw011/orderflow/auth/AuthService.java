@@ -2,6 +2,7 @@ package com.garrettw011.orderflow.auth;
 
 import com.garrettw011.orderflow.auth.dto.*;
 import com.garrettw011.orderflow.common.exception.DuplicateResourceException;
+import com.garrettw011.orderflow.common.security.SecurityUtils;
 import com.garrettw011.orderflow.customer.CustomerService;
 import com.garrettw011.orderflow.user.Role;
 import com.garrettw011.orderflow.user.User;
@@ -58,8 +59,7 @@ public class AuthService {
     }
 
     public CurrentUserResponse currentUser() {
-        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-        User user = userService.getById(userId);
+        User user = userService.getById(SecurityUtils.currentUserId());
         return new CurrentUserResponse(user.getId(), user.getEmail(), user.getRole().name());
     }
 }
