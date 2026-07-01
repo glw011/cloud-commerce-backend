@@ -7,7 +7,7 @@ import java.util.Optional;
 
 @Service
 public class IdempotencyService {
-    private static final String PROCESSING = "__PROCESSING__";
+    public static final String PROCESSING = "__PROCESSING__";
     private static final Duration TTL = Duration.ofHours(24);
 
     private final StringRedisTemplate redis;
