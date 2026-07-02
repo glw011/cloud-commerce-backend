@@ -16,7 +16,7 @@ class AuthFlowTest extends AbstractIntegrationTest {
         String body = """
                 {"email":"newuser@example.com", "password":"NewPass123!","firstName":"Hank","lastName":"Hill"}""";
 
-        mvc.perform(post("/api/v1/auth/register").contentType(appJson).content(body))
+        mvc.perform(post("/api/v1/auth/register").contentType(json).content(body))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accessToken").exists())
@@ -25,7 +25,7 @@ class AuthFlowTest extends AbstractIntegrationTest {
 
     @Test
     void loginSuccessWithCorrectPassword() throws Exception {
-        mvc.perform(post("/api/v1/auth/login").contentType(appJson).content(testCredentials))
+        mvc.perform(post("/api/v1/auth/login").contentType(json).content(testCredentials))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"));
@@ -33,9 +33,9 @@ class AuthFlowTest extends AbstractIntegrationTest {
 
     @Test
     void loginFailsWithBadPassword() throws Exception {
-        String badCredentials = formatCredentials("customer@example.com", "BadPass123!");
+        String badCredentials = credentialBody("customer@example.com", "BadPass123!");
 
-        mvc.perform(post("/api/v1/auth/login").contentType(appJson).content(badCredentials))
+        mvc.perform(post("/api/v1/auth/login").contentType(json).content(badCredentials))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -57,7 +57,7 @@ class AuthFlowTest extends AbstractIntegrationTest {
     @Test
     void meReturnsUserWithValidToken() throws Exception {
         MvcResult login =
-                mvc.perform(post("/api/v1/auth/login").contentType(appJson).content(testCredentials))
+                mvc.perform(post("/api/v1/auth/login").contentType(json).content(testCredentials))
                         .andDo(print())
                         .andExpect(status().isOk())
                         .andReturn();
@@ -74,7 +74,7 @@ class AuthFlowTest extends AbstractIntegrationTest {
     void customerCannotCreateProduct() throws Exception {
         mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(token()))
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("CUST-ITM-001", "Customer Item", "13.99")))
                 .andExpect(status().isForbidden());
     }
@@ -82,7 +82,7 @@ class AuthFlowTest extends AbstractIntegrationTest {
     @Test
     void createWithNoTokenReturns401() throws Exception {
         mvc.perform(post("/api/v1/products")
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("ANON-ITM-001", "Anon Item", "1.00")))
                 .andExpect(status().isUnauthorized());
     }

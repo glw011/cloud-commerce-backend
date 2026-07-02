@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RefreshTokenRotationTest extends AbstractIntegrationTest {
 
     private String login() throws Exception {
-        String body = mvc.perform(post("/api/v1/auth/login").contentType(appJson).content(testCredentials))
+        String body = mvc.perform(post("/api/v1/auth/login").contentType(json).content(testCredentials))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return JsonPath.read(body, "$.refreshToken");
@@ -28,7 +28,7 @@ class RefreshTokenRotationTest extends AbstractIntegrationTest {
         String originalRefresh = login();
 
         String body =
-                mvc.perform(post("/api/v1/auth/refresh").contentType(appJson).content(refreshBody(originalRefresh)))
+                mvc.perform(post("/api/v1/auth/refresh").contentType(json).content(refreshBody(originalRefresh)))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.accessToken").exists())
                         .andExpect(jsonPath("$.refreshToken").exists())
@@ -43,11 +43,11 @@ class RefreshTokenRotationTest extends AbstractIntegrationTest {
         String originalRefresh = login();
 
         // first use succeeds/rotates token
-        mvc.perform(post("/api/v1/auth/refresh").contentType(appJson).content(refreshBody(originalRefresh)))
+        mvc.perform(post("/api/v1/auth/refresh").contentType(json).content(refreshBody(originalRefresh)))
                 .andExpect(status().isOk());
 
         // reusing consumed refresh token should be rejected
-        mvc.perform(post("/api/v1/auth/refresh").contentType(appJson).content(refreshBody(originalRefresh)))
+        mvc.perform(post("/api/v1/auth/refresh").contentType(json).content(refreshBody(originalRefresh)))
                 .andExpect(status().isUnauthorized());
     }
 }

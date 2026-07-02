@@ -7,7 +7,7 @@ spring:
   jpa:
     open-in-view:
     hibernate:
-      ddl-auto: validate         # hibernate only validates mappings
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -29,11 +29,10 @@ management:
     web:
       exposure:
         include: health,info,metrics
-
   endpoint:
     health:
       probes:
-        enabled: true            # enable for AWS
+        enabled: true
       show-details: when_authorized
 
 app:
@@ -45,7 +44,8 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
   order:
-    tax-rate: 0.08               # default flat rate for demos
+    tax-rate: 0.08               # configurable default flat rate until tax calculator added
+    reservation-ttl: 30m         # configurable reservation duration
 
 logging:
   pattern:

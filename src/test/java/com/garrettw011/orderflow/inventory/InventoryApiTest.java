@@ -19,7 +19,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
     private long createProduct(String sku) throws Exception {
         String body = mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson).content(productBody(sku, sku, "10.00")))
+                        .contentType(json).content(productBody(sku, sku, "10.00")))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return ((Number) JsonPath.read(body, "$.id")).longValue();
@@ -28,7 +28,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
     private void adjust(long productId, int delta, String token) throws Exception {
         mvc.perform(patch("/api/v1/inventory/" + productId + "/adjust")
                         .header("Authorization", bearer(token))
-                        .contentType(appJson).content("{\"delta\":" + delta + "}"))
+                        .contentType(json).content("{\"delta\":" + delta + "}"))
                 .andExpect(status().isOk());
     }
 
@@ -37,7 +37,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
         long pid = createProduct("INV-UP-001");
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson).content("{\"delta\":20}"))
+                        .contentType(json).content("{\"delta\":20}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantityOnHand").value(20))
                 .andExpect(jsonPath("$.availableQuantity").value(20));
@@ -49,7 +49,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
         adjust(pid, 20, managerToken());
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(managerToken()))
-                        .contentType(appJson).content("{\"delta\":-5}"))
+                        .contentType(json).content("{\"delta\":-5}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantityOnHand").value(15));
     }
@@ -59,7 +59,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
         long pid = createProduct("INV-NEG-001");
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson).content("{\"delta\":-5}"))
+                        .contentType(json).content("{\"delta\":-5}"))
                 .andExpect(status().isConflict());
     }
 
@@ -74,7 +74,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
 
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson).content("{\"delta\":-5}"))
+                        .contentType(json).content("{\"delta\":-5}"))
                 .andExpect(status().isConflict());
     }
 
@@ -106,7 +106,7 @@ class InventoryApiTest extends AbstractIntegrationTest {
         long pid = createProduct("INV-CUST-1");
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(token()))
-                        .contentType(appJson).content("{\"delta\":5}"))
+                        .contentType(json).content("{\"delta\":5}"))
                 .andExpect(status().isForbidden());
     }
 

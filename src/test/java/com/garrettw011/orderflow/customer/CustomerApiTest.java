@@ -3,23 +3,11 @@ package com.garrettw011.orderflow.customer;
 import com.garrettw011.orderflow.support.AbstractIntegrationTest;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class CustomerApiTest extends AbstractIntegrationTest {
-    private String registerCustomer(String email) throws Exception {
-        String body = """
-                {"email":"%s","password":"Pa55w0rD!","firstName":"Barry","lastName":"Dees","phone":"+1-985-534-3737"}
-                """.formatted(email);
-
-        String resp = mvc.perform(post("/api/v1/auth/register")
-                        .contentType(appJson).content(body))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        return JsonPath.read(resp, "$.accessToken");
-    }
 
     @Test
     void meRequiresAuth() throws Exception {
@@ -45,7 +33,7 @@ class CustomerApiTest extends AbstractIntegrationTest {
 
         mvc.perform(put("/api/v1/customers/me")
                         .header("Authorization", bearer(t))
-                        .contentType(appJson).content(b))
+                        .contentType(json).content(b))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Update"))
                 .andExpect(jsonPath("$.lastName").value("Test"))
@@ -66,7 +54,7 @@ class CustomerApiTest extends AbstractIntegrationTest {
 
         mvc.perform(put("/api/v1/customers/me")
                         .header("Authorization", bearer(token()))
-                        .contentType(appJson).content(b))
+                        .contentType(json).content(b))
                 .andExpect(status().isBadRequest());
     }
 
