@@ -12,9 +12,8 @@ import org.testcontainers.utility.DockerImageName;
 import org.springframework.http.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
-import java.math.BigDecimal;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,22 +33,17 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected MockMvc mvc;
-    protected MediaType appJson = MediaType.APPLICATION_JSON;
+    protected MediaType json = MediaType.APPLICATION_JSON;
     protected String testCredentials = """
             {"email":"customer@example.com","password":"CustomerPass123!"}""";
 
     protected String loginResp(String credentials) throws Exception {
-        return mvc.perform(post("/api/v1/auth/login").contentType(appJson).content(credentials))
+        return mvc.perform(post("/api/v1/auth/login").contentType(json).content(credentials))
                 .andReturn().getResponse().getContentAsString();
     }
 
     protected String tokenFromLoginResp(String loginResp) {
         return JsonPath.read(loginResp, "$.accessToken");
-    }
-
-    protected String formatCredentials(String email, String password) {
-        return """
-                {"email":"%s","password":"%s"}""".formatted(email, password);
     }
 
     protected String loginToken(String credentials) throws Exception {
@@ -59,7 +53,7 @@ public abstract class AbstractIntegrationTest {
     protected String token() throws Exception { return tokenFromLoginResp(loginResp(testCredentials)); }
 
     protected String tokenFor(String email, String password) throws Exception {
-        return tokenFromLoginResp(loginResp(formatCredentials(email, password)));
+        return tokenFromLoginResp(loginResp(credentialBody(email, password)));
     }
 
     protected String adminToken() throws Exception { return tokenFor("admin@example.com", "AdminPass123!"); }
@@ -68,9 +62,42 @@ public abstract class AbstractIntegrationTest {
 
     protected String bearer(String token) { return "Bearer " + token; }
 
+
+    // === Request body helpers ===
+
+    protected String credentialBody(String email, String password) {
+        return """
+                {"email":"%s","password":"%s"}""".formatted(email, password);
+    }
+
     protected String productBody(String sku, String name, String price) {
         return """
                {"sku":"%s","name":"%s","price":"%s"}""".formatted(sku, name, price);
+    }
+
+    protected String orderBody(long productId, int qty) {
+        return """
+                {"items":[%s]}""".formatted(orderItemBody(productId, qty));
+    }
+
+    protected String orderItemBody(long productId, int qty) {
+        return """
+                {"productId":%d, "quantity":%d}""".formatted(productId, qty);
+    }
+
+
+    // === Register test customer ===
+
+    protected String registerCustomer(String email) throws Exception {
+        String body = """
+                {"email":"%s","password":"Pa55w0rD!","firstName":"Barry","lastName":"Dees","phone":"+1-985-534-3737"}
+                """.formatted(email);
+
+        String resp = mvc.perform(post("/api/v1/auth/register")
+                        .contentType(json).content(body))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return JsonPath.read(resp, "$.accessToken");
     }
 }
 

@@ -52,7 +52,7 @@ class ProductApiTest extends AbstractIntegrationTest {
     void adminCanCreateProduct() throws Exception {
         mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("NEW-SKU-001", "New", "9.99")))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sku").value("NEW-SKU-001"))
@@ -63,7 +63,7 @@ class ProductApiTest extends AbstractIntegrationTest {
     void adminCanDeactivateProduct() throws Exception {
         String created = mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("DEAC-TIV-001", "Deactivate", "0.99")))
                 .andReturn().getResponse().getContentAsString();
 
@@ -79,7 +79,7 @@ class ProductApiTest extends AbstractIntegrationTest {
     void duplicateSkuReturns409() throws Exception {
         mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("KM-KB-MECH-001", "Duplicate", "3.50")))
                 .andExpect(status().isConflict());
     }
@@ -88,7 +88,7 @@ class ProductApiTest extends AbstractIntegrationTest {
     void badPriceReturns400() throws Exception {
         mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
-                        .contentType(appJson)
+                        .contentType(json)
                         .content(productBody("BAD-PRC-001", "Bad Price", "-0.99")))
                 .andExpect(status().isBadRequest());
     }
