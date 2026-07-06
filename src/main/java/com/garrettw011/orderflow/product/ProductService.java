@@ -1,5 +1,6 @@
 package com.garrettw011.orderflow.product;
 
+import com.garrettw011.orderflow.common.PageResponse;
 import com.garrettw011.orderflow.common.exception.DuplicateResourceException;
 import com.garrettw011.orderflow.common.exception.InvalidStateTransitionException;
 import com.garrettw011.orderflow.common.exception.ResourceNotFoundException;
@@ -11,6 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 @Service
 public class ProductService {
@@ -18,31 +22,13 @@ public class ProductService {
     private final InventoryRepository inventory;
     private final OrderItemRepository orderItems;
 
-    private ProductResponse toResponse(Product p) {
-        return new ProductResponse(
-                p.getId(),
-                p.getSku(),
-                p.getName(),
-                p.getDescription(),
-                p.getPrice(),
-                p.isActive(),
-                p.getCreatedAt(),
-                p.getUpdatedAt());
-    }
-
-    private Product getEntity(Long id) {
-        return products.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No product found with ID: " + id));
-    }
-
-    private String normalizeSku(String sku) { return sku == null ? null : sku.trim().toUpperCase(); }
-
     public ProductService(ProductRepository products, InventoryRepository inventory, OrderItemRepository orderItems) {
         this.products = products;
         this.inventory = inventory;
         this.orderItems = orderItems;
     }
 
+    @CacheEvict(cacheNames = "product-list", allEntries = true)
     @Transactional
     public ProductResponse create(ProductCreateRequest req) {
         String sku = normalizeSku(req.sku());
@@ -69,6 +55,10 @@ public class ProductService {
         return toResponse(p);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", key = "'id:' + #result.id()"),
+            @CacheEvict(cacheNames = "products", key = "'sku:' + #result.sku()"),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
     @Transactional
     public ProductResponse update(Long id, ProductUpdateRequest req) {
         Product p = getEntity(id);
@@ -80,6 +70,10 @@ public class ProductService {
         return toResponse(products.save(p));
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", key = "'id:' + #result.id()"),
+            @CacheEvict(cacheNames = "products", key = "'sku:' + #result.sku()"),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
     @Transactional
     public ProductResponse deactivate(Long id) {
         Product p = getEntity(id);
@@ -87,6 +81,9 @@ public class ProductService {
         return toResponse(products.save(p));
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", allEntries = true),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
     @Transactional
     public void delete(Long id) {
         if (orderItems.existsByProductId(id)) {
@@ -99,11 +96,13 @@ public class ProductService {
         products.delete(p);
     }
 
+    @Cacheable(cacheNames = "products", key = "'id:' + #id")
     @Transactional(readOnly = true)
     public ProductResponse getById(Long id) {
         return toResponse(getEntity(id));
     }
 
+    @Cacheable(cacheNames = "products", key = "'sku:' + #sku.trim().toUpperCase()")
     @Transactional(readOnly = true)
     public ProductResponse getBySku(String sku) {
         return products.findBySku(normalizeSku(sku))
@@ -111,13 +110,33 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("No product found with SKU: " + sku));
     }
 
+    @Cacheable(cacheNames = "product-list", key = "#params.toString() + '::' + #pageable.toString()")
     @Transactional(readOnly = true)
-    public Page<ProductResponse> search(ProductSearchParams params, Pageable pageable) {
-        return products.findAll(ProductSpecifications.withFilters(params), pageable)
+    public PageResponse<ProductResponse> search(ProductSearchParams params, Pageable pageable) {
+        Page<ProductResponse> page = products.findAll(ProductSpecifications.withFilters(params), pageable)
                 .map(this::toResponse);
+
+        return PageResponse.from(page);
     }
 
+    private ProductResponse toResponse(Product p) {
+        return new ProductResponse(
+                p.getId(),
+                p.getSku(),
+                p.getName(),
+                p.getDescription(),
+                p.getPrice(),
+                p.isActive(),
+                p.getCreatedAt(),
+                p.getUpdatedAt());
+    }
 
+    private Product getEntity(Long id) {
+        return products.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No product found with ID: " + id));
+    }
+
+    private String normalizeSku(String sku) { return sku == null ? null : sku.trim().toUpperCase(); }
 }
 
 
