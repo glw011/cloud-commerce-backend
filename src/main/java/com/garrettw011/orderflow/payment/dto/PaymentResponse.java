@@ -10,7 +10,7 @@ public record PaymentResponse(Long id,
                               String provider,
                               String status,
                               BigDecimal amount,
-                              @Nullable String transactionRef,
+                              @Nullable String transactionReference,
                               String orderStatus,
                               Instant createdAt) {}
 

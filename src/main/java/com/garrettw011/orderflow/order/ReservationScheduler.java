@@ -23,9 +23,11 @@ public class ReservationScheduler {
         this.procService = procService;
     }
 
-    @Scheduled(fixedDelayString = "${app.order.expired-reservation-scans:1m}")
+    @Scheduled(fixedDelayString = "${app.order.reservation-scan:1m}")
     @SchedulerLock(name = "releaseExpiredReservations", lockAtMostFor = "5m", lockAtLeastFor = "30s")
-    public void releaseExpiredReservations() {
+    public void releaseExpiredReservations() { reclaimExpired(); }
+
+    public void reclaimExpired() {
         List<Long> orderIds = reservations.findOrderIdsWithExpiredReservations(
                 InventoryReservationStatus.ACTIVE, Instant.now());
 

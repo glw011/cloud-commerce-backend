@@ -14,23 +14,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class OrderApiTest extends AbstractIntegrationTest {
-    private long stockNewProduct(String sku, String price, int qty) throws Exception {
-        String created = mvc.perform(post("/api/v1/products")
-                        .header("Authorization", bearer(adminToken()))
-                        .contentType(json)
-                        .content(productBody(sku, "Test ".concat(sku), price)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-
-        long pid = ((Number) JsonPath.read(created, "$.id")).longValue();
-        mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
-                        .header("Authorization", bearer(adminToken()))
-                        .contentType(json)
-                        .content("{\"delta\":" + qty + "}"))
-                .andExpect(status().isOk());
-        return pid;
-    }
-
     @Test
     void placeOrderComputesStockQty() throws Exception {
         long pid = stockNewProduct("ORD-TST-P01", "10.00", 100);
