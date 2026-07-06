@@ -12,6 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 import org.springframework.http.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,7 +83,7 @@ public abstract class AbstractIntegrationTest {
 
     protected String orderItemBody(long productId, int qty) {
         return """
-                {"productId":%d, "quantity":%d}""".formatted(productId, qty);
+                {"productId":%d,"quantity":%d}""".formatted(productId, qty);
     }
 
 
@@ -98,6 +99,26 @@ public abstract class AbstractIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return JsonPath.read(resp, "$.accessToken");
+    }
+
+
+    // === Stock new test product ===
+
+    protected long stockNewProduct(String sku, String price, int qty) throws Exception {
+        String created = mvc.perform(post("/api/v1/products")
+                        .header("Authorization", bearer(adminToken()))
+                        .contentType(json)
+                        .content(productBody(sku, "Test ".concat(sku), price)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long pid = ((Number) JsonPath.read(created, "$.id")).longValue();
+        mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
+                        .header("Authorization", bearer(adminToken()))
+                        .contentType(json)
+                        .content("{\"delta\":" + qty + "}"))
+                .andExpect(status().isOk());
+        return pid;
     }
 }
 
