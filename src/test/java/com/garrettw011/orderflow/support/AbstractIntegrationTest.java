@@ -101,18 +101,23 @@ public abstract class AbstractIntegrationTest {
         return JsonPath.read(resp, "$.accessToken");
     }
 
+    // === Create test product ===
 
-    // === Stock new test product ===
-
-    protected long stockNewProduct(String sku, String price, int qty) throws Exception {
+    protected long createProduct(String sku, String price) throws Exception {
         String created = mvc.perform(post("/api/v1/products")
                         .header("Authorization", bearer(adminToken()))
                         .contentType(json)
                         .content(productBody(sku, "Test ".concat(sku), price)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
+        return ((Number) JsonPath.read(created, "$.id")).longValue();
+    }
 
-        long pid = ((Number) JsonPath.read(created, "$.id")).longValue();
+
+    // === Stock new test product ===
+
+    protected long stockNewProduct(String sku, String price, int qty) throws Exception {
+        long pid = createProduct(sku, price);
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(adminToken()))
                         .contentType(json)

@@ -38,8 +38,8 @@ public class ProductController {
             @RequestParam(required = false) String sku,
             Pageable pageable) {
         Boolean effectiveActive = isPrivileged() ? active : Boolean.TRUE;
-        var params = new ProductSearchParams(active, minPrice,maxPrice, name, sku);
-        return PageResponse.from(service.search(params, pageable));
+        var params = new ProductSearchParams(effectiveActive, minPrice,maxPrice, name, sku);
+        return service.search(params, pageable);
     }
 
     @GetMapping("/{id}")

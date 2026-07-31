@@ -72,3 +72,20 @@
 
 <br>
 
+## Caching Strategy
+### Cached:
+- ##### Product lookup (`getById`, `getBySku`)
+   > _READ_ is much more frequent than _WRITE_ since product changes are rare, evict only when product changes 
+
+- ##### Paginated list (`search`):
+   > Likely to be the _READ_ with highest traffic, but key is entire { _filter_ + _page_ + _sort_ } combination...
+   > Can't know which cached pages contain changed product, so any _WRITE_ requires evict of all cache entries 
+
+### _NOT_ Cached:
+- ##### Inventory availability:
+   > Changes on each reservation, payment, etc., so caching offers basically no benefits. Especially since it's already
+   > only a single-row _READ_
+
+---
+
+<br>
