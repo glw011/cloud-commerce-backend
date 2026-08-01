@@ -24,6 +24,13 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
 management:
   endpoints:
     web:
