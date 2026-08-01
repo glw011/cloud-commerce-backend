@@ -15,7 +15,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("""
         SELECT new com.garrettw011.orderflow.report.dto.TopProduct(
-                p.id, p.sku, p.name, SUM(oi.quantity), SUM(or.lineTotal))
+                p.id, p.sku, p.name, SUM(oi.quantity), SUM(oi.lineTotal))
         FROM OrderItem oi 
                 JOIN oi.product p
                 JOIN oi.order o
