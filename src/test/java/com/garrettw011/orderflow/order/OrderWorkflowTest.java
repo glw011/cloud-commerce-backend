@@ -4,7 +4,6 @@ import com.garrettw011.orderflow.inventory.InventoryReservation;
 import com.garrettw011.orderflow.inventory.InventoryReservationRepository;
 import com.garrettw011.orderflow.support.AbstractIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.List;
@@ -17,16 +16,6 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
     @Autowired InventoryReservationRepository reservations;
     @Autowired ReservationScheduler scheduler;
 
-    private long placeOrder(long productId, int qty) throws Exception {
-        String order = mvc.perform(post("/api/v1/orders")
-                        .header("Authorization", bearer(token()))
-                        .contentType(json)
-                        .content(orderBody(productId, qty)))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
-
-        return ((Number) JsonPath.read(order, "$.id")).longValue();
-    }
-
     private String pay(long orderId, String token) {
         return """
             {"provider":"stripe","paymentToken":"%s"}""".formatted(token);
@@ -34,7 +23,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void payingConsumesStockAndMarksOrderPaid() throws Exception {
-        long pid = stockNewProduct("LC-P1", "10.00", 100);
+        long pid = createStockedProduct("LC-P1", "10.00", 100);
         long orderId = placeOrder(pid, 4);
 
         mvc.perform(post("/api/v1/orders/" + orderId + "/payments")
@@ -54,7 +43,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void declinedPaymentReleasesStockAndFailsOrder() throws Exception {
-        long pid = stockNewProduct("LC-P2", "10.00", 100);
+        long pid = createStockedProduct("LC-P2", "10.00", 100);
         long orderId = placeOrder(pid, 4);
 
         mvc.perform(post("/api/v1/orders/" + orderId + "/payments")
@@ -73,7 +62,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void cannotPayAnAlreadyPaidOrder() throws Exception {
-        long pid = stockNewProduct("LC-P3", "10.00", 100);
+        long pid = createStockedProduct("LC-P3", "10.00", 100);
         long orderId = placeOrder(pid, 1);
         mvc.perform(post("/api/v1/orders/" + orderId + "/payments")
                         .header("Authorization", bearer(token()))
@@ -90,7 +79,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void cancelingReleasesStock() throws Exception {
-        long pid = stockNewProduct("LC-P4", "10.00", 100);
+        long pid = createStockedProduct("LC-P4", "10.00", 100);
         long orderId = placeOrder(pid, 6);
 
         mvc.perform(post("/api/v1/orders/" + orderId + "/cancel")
@@ -106,7 +95,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void fulfillmentFlowRequiresPaidAndTheRightRole() throws Exception {
-        long pid = stockNewProduct("LC-P5", "10.00", 100);
+        long pid = createStockedProduct("LC-P5", "10.00", 100);
         long orderId = placeOrder(pid, 1);
 
         mvc.perform(post("/api/v1/orders/" + orderId + "/fulfill")
@@ -136,7 +125,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void listingPaymentsReturnsAttempt() throws Exception {
-        long pid = stockNewProduct("LC-P6", "10.00", 100);
+        long pid = createStockedProduct("LC-P6", "10.00", 100);
         long orderId = placeOrder(pid, 1);
 
         mvc.perform(post("/api/v1/orders/" + orderId + "/payments")
@@ -154,7 +143,7 @@ class OrderWorkflowTest extends AbstractIntegrationTest {
 
     @Test
     void schedulerReleasesStaleReservations() throws Exception {
-        long pid = stockNewProduct("LC-P7", "10.00", 100);
+        long pid = createStockedProduct("LC-P7", "10.00", 100);
         long orderId = placeOrder(pid, 5);
 
         List<InventoryReservation> rs = reservations.findByOrderId(orderId);
