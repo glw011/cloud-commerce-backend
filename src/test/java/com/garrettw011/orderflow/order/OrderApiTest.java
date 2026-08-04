@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OrderApiTest extends AbstractIntegrationTest {
     @Test
     void placeOrderComputesStockQty() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P01", "10.00", 100);
+        long pid = createStockedProduct("ORD-TST-P01", "10.00", 100);
 
         mvc.perform(post("/api/v1/orders")
                         .header("Authorization", bearer(token()))
@@ -40,7 +40,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void dupOrderItemsAreMerged() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P02", "5.00", 100);
+        long pid = createStockedProduct("ORD-TST-P02", "5.00", 100);
         String body = """
                        {"items":[%s,%s]}""".formatted(orderItemBody(pid, 2), orderItemBody(pid, 3));
 
@@ -56,7 +56,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void qtyExceedsStockReturns409() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P03", "10.00", 1);
+        long pid = createStockedProduct("ORD-TST-P03", "10.00", 1);
         mvc.perform(post("/api/v1/orders")
                         .header("Authorization", bearer(token()))
                         .contentType(json)
@@ -75,7 +75,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void inactiveProductReturns404() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P04", "10.00", 10);
+        long pid = createStockedProduct("ORD-TST-P04", "10.00", 10);
         mvc.perform(patch("/api/v1/products/" + pid + "/deactivate")
                         .header("Authorization", bearer(adminToken())))
                 .andExpect(status().isOk());
@@ -90,7 +90,7 @@ class OrderApiTest extends AbstractIntegrationTest {
     @Test
     void snapshotPreservesOrderPrice() throws Exception {
         // create order
-        long pid = stockNewProduct("ORD-TST-P05", "10.00", 100);
+        long pid = createStockedProduct("ORD-TST-P05", "10.00", 100);
         String order = mvc.perform(post("/api/v1/orders")
                         .header("Authorization", bearer(token()))
                         .contentType(json)
@@ -118,7 +118,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void otherCustomersOrderReturns404() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P06", "10.00", 100);
+        long pid = createStockedProduct("ORD-TST-P06", "10.00", 100);
         String order = mvc.perform(post("/api/v1/orders")
                         .header("Authorization", bearer(token()))
                         .contentType(json).content(orderBody(pid, 1)))
@@ -140,7 +140,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void idempotentRetryWontReserveTwice() throws Exception {
-        long pid = stockNewProduct("ORD-TST-P07", "10.00", 100);
+        long pid = createStockedProduct("ORD-TST-P07", "10.00", 100);
         String key = "idem-key-qwe123";
 
         String first = mvc.perform(post("/api/v1/orders")
@@ -180,7 +180,7 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void concurrentOrdersWontOversell() throws Exception {
-        long pid = stockNewProduct("ORD-RACE-TST", "10.00", 1);
+        long pid = createStockedProduct("ORD-RACE-TST", "10.00", 1);
         String token = token();
 
         Callable<Integer> place = () -> mvc.perform(post("/api/v1/orders")

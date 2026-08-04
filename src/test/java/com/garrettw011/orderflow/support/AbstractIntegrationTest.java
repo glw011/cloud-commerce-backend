@@ -1,5 +1,6 @@
 package com.garrettw011.orderflow.support;
 
+import com.garrettw011.orderflow.order.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -42,6 +43,8 @@ public abstract class AbstractIntegrationTest {
         return mvc.perform(post("/api/v1/auth/login").contentType(json).content(credentials))
                 .andReturn().getResponse().getContentAsString();
     }
+
+    // === Token helpers ===
 
     protected String tokenFromLoginResp(String loginResp) {
         return JsonPath.read(loginResp, "$.accessToken");
@@ -86,12 +89,20 @@ public abstract class AbstractIntegrationTest {
                 {"productId":%d,"quantity":%d}""".formatted(productId, qty);
     }
 
+    protected String payBody(String provider, String token) {
+        return """
+                {"provider":"%s","paymentToken":"%s"}""".formatted(provider, token);
+    }
+
+    protected String payBody() {
+        return payBody("provider", "tok_ok");
+    }
 
     // === Register test customer ===
 
     protected String registerCustomer(String email) throws Exception {
         String body = """
-                {"email":"%s","password":"Pa55w0rD!","firstName":"Barry","lastName":"Dees","phone":"+1-985-534-3737"}
+                {"email":"%s","password":"Pa55w0rD!","firstName":"Barry","lastName":"Dees","phone":"+1-915-345-3737"}
                 """.formatted(email);
 
         String resp = mvc.perform(post("/api/v1/auth/register")
@@ -116,7 +127,7 @@ public abstract class AbstractIntegrationTest {
 
     // === Stock new test product ===
 
-    protected long stockNewProduct(String sku, String price, int qty) throws Exception {
+    protected long createStockedProduct(String sku, String price, int qty) throws Exception {
         long pid = createProduct(sku, price);
         mvc.perform(patch("/api/v1/inventory/" + pid + "/adjust")
                         .header("Authorization", bearer(adminToken()))
@@ -124,6 +135,28 @@ public abstract class AbstractIntegrationTest {
                         .content("{\"delta\":" + qty + "}"))
                 .andExpect(status().isOk());
         return pid;
+    }
+
+    // === Place new test order ===
+
+    protected long placeOrder(long productId, int qty) throws Exception {
+        String order = mvc.perform(post("/api/v1/orders")
+                        .header("Authorization", bearer(token()))
+                        .contentType(json)
+                        .content(orderBody(productId, qty)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+        return ((Number) JsonPath.read(order, "$.id")).longValue();
+    }
+
+    // === Simulate payment for test order ===
+
+    protected void payOrder(long orderId) throws Exception {
+        mvc.perform(post("/api/v1/orders/" + orderId + "/payments")
+                        .header("Authorization", bearer(token()))
+                        .contentType(json)
+                        .content(payBody()))
+                .andExpect(status().isCreated());
     }
 }
 
