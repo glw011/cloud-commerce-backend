@@ -1,27 +1,38 @@
+server:
+  shutdown: graceful
+
 spring:
   application:
     name: orderflow
   jpa:
     open-in-view:
     hibernate:
-      ddl-auto: validate         # hibernate only validates mappings
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
   flyway:
     enabled: true
     locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: non_null
+  data:
+    web:
+      pageable:
+        default-page-size: 20
+        max-page-size: 100
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
-
   endpoint:
     health:
       probes:
-        enabled: true            # enable for AWS
+        enabled: true
       show-details: when_authorized
 
 app:
@@ -30,6 +41,12 @@ app:
       issuer: orderflow
       access-token-ttl: 15m
       refresh-token-ttl: 7d
-
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
   order:
-    tax-rate: 0.08               # default flat rate for demos
+    tax-rate: 0.08               # configurable default flat rate until tax calculator added
+    reservation-ttl: 30m         # configurable reservation duration
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{requestId:-}]"

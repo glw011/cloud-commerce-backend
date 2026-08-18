@@ -8,7 +8,9 @@
 
 OrderFlow is a backend platform for small e-commerce operations aimed at providing administrative product management for businesses and customers using role-based access. 
 
-_OrderFlow manages_:
+<div style="margin: 0 auto; width: max-content;">
+
+***Manages***:
 - Products and inventory
 - Customers 
 - Orders
@@ -17,7 +19,7 @@ _OrderFlow manages_:
 - Payments (currently simulated)
 - Order fulfillment status  
 
-_OrderFlow offers_:
+***Includes***:
 - Transaction safety
 - Inventory consistency
 - API validation
@@ -27,28 +29,38 @@ _OrderFlow offers_:
 - Testing
 - Observability
 
+</div>
+
 ---
+
+<br>
 
 ## Tech Stack
 
+<div style="margin: 0 auto; width: max-content;">
+
 **Core stack**: 
-  - _Language_: Java `21` 
-  - _Framework_: Spring Boot `4.1.0`
-  - _Build Tool_: Maven 
-  - _Database_: PostgreSQL `16`
-  - _Migrations_: Flyway 
-  - _Cache_: Redis `7`
-  - _Auth_: Spring Security + JWT
-  - _Local Dev_: Docker Compose `v2`
-  - _CI/CD_: GitHub Actions
-  - _Deployment_: AWS ECS Fargate 
-  - _Hosting_: RDS PostgreSQL 
-  - _Container Registry_: ECR 
-  - _Logs_: CloudWatch Logs 
-  - _Documentation_: OpenAPI/Swagger 
-  - _Metrics_: Spring Boot Actuator
+  - _Language_: `Java 21` 
+  - _Framework_: `Spring Boot 4.1.0`
+  - _Build Tool_: `Maven` 
+  - _Database_: `PostgreSQL 16`
+  - _Migrations_: `Flyway` 
+  - _Cache_: `Redis 7`
+  - _Auth_: `Spring Security` + `JWT`
+  - _Local Dev_: `Docker Compose v2`
+  - _CI/CD_: `GitHub Actions`
+  - _Deployment_: `AWS ECS Fargate` 
+  - _Hosting_: `RDS PostgreSQL` 
+  - _Container Registry_: `ECR` 
+  - _Logs_: `CloudWatch Logs` 
+  - _Documentation_: `OpenAPI/Swagger` 
+  - _Metrics_: `Spring Boot Actuator`
+
+</div>
 
 ---
+
+<br>
 
 ## Planned Architecture
 
@@ -97,9 +109,13 @@ ECS Fargate Service
 
 ---
 
+<br>
+
 ## Planned Features
 
 ---
+
+<br>
 
 ## Local Setup
 
@@ -119,7 +135,7 @@ curl http://localhost:8080/actuator/health  # use separate terminal
 docker compose down
 ```
 
-### Instructions
+### Setup Instructions
 
 1. **Clone repository**:
    ```bash
@@ -168,26 +184,36 @@ docker compose down
 
 8. **Stop services when done**:
    ```bash
-   docker compse down 
+   docker compose down 
    ```
    <br/>
 
 ---
 
+<br>
+
 ## Testing
 
 ---
+
+<br>
 
 ## Deployment
 
 ---
 
+<br>
+
 ## Demo Credentials
+
+<div style="margin: 0 auto; width: max-content;">
 
 |   | _Login_ | _Password_ |
 |---|---|---|
 | <p align="center"> **_Customer_** </p> | <p align="right"> `customer@example.com` </p> | `CustomerPass123!` |
 | <p align="center"> **_Warehouse_**<br>**_Manager_** </p> | <p align="right"> `warehouse@example.com` </p> | `WarehousePass123!` |
 | <p align="center"> **_Admin_** </p> | <p align="right"> `admin@example.com` </p> | `AdminPass123!` |
+
+</div>
 
 ---

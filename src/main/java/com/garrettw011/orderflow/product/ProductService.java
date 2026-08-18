@@ -1,0 +1,151 @@
+package com.garrettw011.orderflow.product;
+
+import com.garrettw011.orderflow.common.PageResponse;
+import com.garrettw011.orderflow.common.exception.DuplicateResourceException;
+import com.garrettw011.orderflow.common.exception.InvalidStateTransitionException;
+import com.garrettw011.orderflow.common.exception.ResourceNotFoundException;
+import com.garrettw011.orderflow.inventory.InventoryItem;
+import com.garrettw011.orderflow.inventory.InventoryRepository;
+import com.garrettw011.orderflow.order.OrderItemRepository;
+import com.garrettw011.orderflow.product.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+
+@Service
+public class ProductService {
+    private final ProductRepository products;
+    private final InventoryRepository inventory;
+    private final OrderItemRepository orderItems;
+
+    public ProductService(ProductRepository products, InventoryRepository inventory, OrderItemRepository orderItems) {
+        this.products = products;
+        this.inventory = inventory;
+        this.orderItems = orderItems;
+    }
+
+    @CacheEvict(cacheNames = "product-list", allEntries = true)
+    @Transactional
+    public ProductResponse create(ProductCreateRequest req) {
+        String sku = normalizeSku(req.sku());
+
+        if (products.existsBySku(sku)) {
+            throw new DuplicateResourceException("Product already exists with SKU: " + sku);
+        }
+
+        Product p = new Product();
+        p.setSku(sku);
+        p.setName(req.name());
+        p.setDescription(req.description());
+        p.setPrice(req.price());
+        p.setActive(req.active() == null || req.active());
+        products.save(p);
+
+        InventoryItem item = new InventoryItem();
+        item.setProduct(p);
+        item.setQuantityOnHand(0);
+        item.setQuantityReserved(0);
+        item.setReorderThreshold(0);
+        inventory.save(item);
+
+        return toResponse(p);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", key = "'id:' + #result.id()"),
+            @CacheEvict(cacheNames = "products", key = "'sku:' + #result.sku()"),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
+    @Transactional
+    public ProductResponse update(Long id, ProductUpdateRequest req) {
+        Product p = getEntity(id);
+        p.setName(req.name());
+        p.setDescription(req.description());
+        p.setPrice(req.price());
+        p.setActive(req.active());
+
+        return toResponse(products.save(p));
+    }
+
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", key = "'id:' + #result.id()"),
+            @CacheEvict(cacheNames = "products", key = "'sku:' + #result.sku()"),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
+    @Transactional
+    public ProductResponse deactivate(Long id) {
+        Product p = getEntity(id);
+        p.setActive(false);
+        return toResponse(products.save(p));
+    }
+
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", allEntries = true),
+            @CacheEvict(cacheNames = "product-list", allEntries = true)})
+    @Transactional
+    public void delete(Long id) {
+        if (orderItems.existsByProductId(id)) {
+            throw new InvalidStateTransitionException(
+                    "Products in order history cannot be deleted, deactivate instead.");
+        }
+
+        Product p = getEntity(id);
+        inventory.findByProductId(id).ifPresent(inventory::delete);
+        products.delete(p);
+    }
+
+    @Cacheable(cacheNames = "products", key = "'id:' + #id")
+    @Transactional(readOnly = true)
+    public ProductResponse getById(Long id) {
+        return toResponse(getEntity(id));
+    }
+
+    @Cacheable(cacheNames = "products", key = "'sku:' + #sku.trim().toUpperCase()")
+    @Transactional(readOnly = true)
+    public ProductResponse getBySku(String sku) {
+        return products.findBySku(normalizeSku(sku))
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("No product found with SKU: " + sku));
+    }
+
+    @Cacheable(cacheNames = "product-list", key = "#params.toString() + '::' + #pageable.toString()")
+    @Transactional(readOnly = true)
+    public PageResponse<ProductResponse> search(ProductSearchParams params, Pageable pageable) {
+        Page<ProductResponse> page = products.findAll(ProductSpecifications.withFilters(params), pageable)
+                .map(this::toResponse);
+
+        return PageResponse.from(page);
+    }
+
+    private ProductResponse toResponse(Product p) {
+        return new ProductResponse(
+                p.getId(),
+                p.getSku(),
+                p.getName(),
+                p.getDescription(),
+                p.getPrice(),
+                p.isActive(),
+                p.getCreatedAt(),
+                p.getUpdatedAt());
+    }
+
+    private Product getEntity(Long id) {
+        return products.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No product found with ID: " + id));
+    }
+
+    private String normalizeSku(String sku) { return sku == null ? null : sku.trim().toUpperCase(); }
+}
+
+
+
+
+
+
+
+
+
+
+

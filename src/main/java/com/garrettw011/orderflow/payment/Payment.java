@@ -1,10 +1,12 @@
 package com.garrettw011.orderflow.payment;
 
 import com.garrettw011.orderflow.order.Order;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -31,7 +33,7 @@ public class Payment {
     private BigDecimal amount;
 
     @Column(name = "transaction_reference", length = 128)
-    private String transactionReference;
+    private @Nullable String transactionReference;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

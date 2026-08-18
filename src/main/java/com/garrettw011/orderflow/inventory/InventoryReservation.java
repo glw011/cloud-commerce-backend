@@ -2,10 +2,12 @@ package com.garrettw011.orderflow.inventory;
 
 import com.garrettw011.orderflow.order.Order;
 import com.garrettw011.orderflow.product.Product;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 @Entity
@@ -32,7 +34,7 @@ public class InventoryReservation {
     private InventoryReservationStatus status;
 
     @Column(name = "expires_at")
-    private Instant expiresAt;
+    private @Nullable Instant expiresAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

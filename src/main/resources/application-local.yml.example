@@ -24,4 +24,9 @@ management:
 app:
   security:
     jwt:
-      secret-key: ${JWT_SECRET:dev-only-secret-please-change-me-locally}
+      issuer: orderflow
+      access-token-ttl: 15m
+      refresh-token-ttl: 7d
+
+      # 32 Byte (256 bit) secret
+      secret: ${JWT_SECRET:PleaseChangeDevOnlySecretLocally}

@@ -1,10 +1,12 @@
 package com.garrettw011.orderflow.customer;
 
 import com.garrettw011.orderflow.user.User;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 @Entity
@@ -13,7 +15,7 @@ import java.time.Instant;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", unique = true)
@@ -26,7 +28,7 @@ public class Customer {
     private String lastName;
 
     @Column(length = 32)
-    private String phone;
+    private @Nullable String phone;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
