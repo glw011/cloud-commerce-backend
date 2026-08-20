@@ -2,13 +2,9 @@ package com.garrettw011.orderflow.support;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.postgresql.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.springframework.http.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
@@ -19,25 +15,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public abstract class AbstractIntegrationTest {
-    @ServiceConnection
-    static final PostgreSQLContainer POSTGRES =
-            new PostgreSQLContainer(DockerImageName.parse("postgres:16-alpine"));
-
-    @ServiceConnection
-    static final GenericContainer<?> REDIS =
-            new GenericContainer<>(DockerImageName.parse("redis:7-alpine")).withExposedPorts(6379);
-    static {
-        POSTGRES.start();
-        REDIS.start();
-    }
+public abstract class AbstractIntegrationTest extends AbstractContainerTest {
 
     @Autowired
     protected MockMvc mvc;
     protected MediaType json = MediaType.APPLICATION_JSON;
     protected String testCredentials = """
             {"email":"customer@example.com","password":"CustomerPass123!"}""";
-
     protected String loginResp(String credentials) throws Exception {
         return mvc.perform(post("/api/v1/auth/login").contentType(json).content(credentials))
                 .andReturn().getResponse().getContentAsString();
