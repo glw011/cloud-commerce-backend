@@ -78,7 +78,7 @@ public abstract class AbstractIntegrationTest extends AbstractContainerTest {
     }
 
     protected String payBody() {
-        return payBody("provider", "tok_ok");
+        return payBody("stripe", "tok_ok");
     }
 
     // === Register test customer ===

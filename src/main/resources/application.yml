@@ -35,12 +35,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health, info, metrics, prometheus
   endpoint:
     health:
       probes:
         enabled: true
-      show-details: when_authorized
+      show-details: never
+      group:
+        readiness:
+          include: readinessState, db
 
 app:
   security:
@@ -51,9 +54,11 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
   order:
-    tax-rate: 0.08               # configurable default flat rate until tax calculator added
-    reservation-ttl: 30m         # configurable reservation duration
+    tax-rate: 0.08               # default flat rate until tax calculator added
+    reservation-ttl: 30m         # reservation duration
 
 logging:
+  level:
+    org.springframework.data.repository.config: WARN
   pattern:
     level: "%5p [${spring.application.name},%X{requestId:-}]"
