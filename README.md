@@ -1,5 +1,7 @@
 # OrderFlow
 
+![CI](https://github.com/glw011/cloud-commerce-backend/actions/workflows/ci.yml/badge.svg?branch=develop)
+
 ### Project Goal: 
 
   Build a realistic backend platform demonstrating clean API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation.
@@ -112,6 +114,7 @@ ECS Fargate Service
 <br>
 
 ## Planned Features
+_TBD_
 
 ---
 
@@ -119,10 +122,13 @@ ECS Fargate Service
 
 ## Local Setup
 
-### Requirements 
-  - JDK 21, 
-  - Docker Desktop (running), 
-  - Git
+### Prerequisites 
+  - JDK 21
+    * Download: [Oracle JDK 21](https://oracle.com) or [OpenJDK 21](https://adoptium.net)
+    * Verify: `java -version`
+  - Docker + Compose (included with Docker Desktop)
+    * Download: [Docker](https://docs.docker.com/compose/install/)
+    * Verify: `docker compose version`
 
 ### Quick Setup
   From project root:
@@ -131,7 +137,13 @@ cp .env.example .env
 cp ./src/main/resources/application-local.yml.example ./src/main/resources/application-local.yml
 docker compose up -d
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
+```
+  Confirm using a separate terminal:
+```bash
 curl http://localhost:8080/actuator/health  # use separate terminal
+```
+  To close when finished:
+```bash
 docker compose down
 ```
 
@@ -155,12 +167,13 @@ docker compose down
    ```
    <br/>
 
-4. **Copy example config file & create '`application-local.yml`'**:
+4. **Copy example & create '`application-local.yml`'**:
    ```bash
    cp ./src/main/resources/application-local.yml.example ./src/main/resources/application-local.yml 
    ```
    _Changing secret in `application-local.yml` *recommended* but defaults will work._
    <br/>
+   
    <br/>
 
 5. **Start PostgreSQL and Redis**:
