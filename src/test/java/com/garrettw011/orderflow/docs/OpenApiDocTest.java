@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class OpenApiDocsTest extends AbstractIntegrationTest {
+class OpenApiDocTest extends AbstractIntegrationTest {
 
     @Test
     void docsDescribeApiAndServedWithoutAuth() throws Exception {
