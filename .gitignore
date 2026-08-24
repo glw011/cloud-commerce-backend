@@ -80,6 +80,7 @@ jacoco.exec
 jacoco-ut.exec
 jacoco-it.exec
 .testcontainers.properties
+prodtest.sh
 
 # ===== OS =====
 .DS_Store
