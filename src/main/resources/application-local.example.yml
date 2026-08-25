@@ -21,10 +21,9 @@ management:
         include: health, info, metrics, env, prometheus
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
 
 app:
   security:
     jwt:
-      # 32 Byte (256 bit) secret
-      secret: ${JWT_SECRET:PleaseChangeDevOnlySecretLocally}
+      secret: ${JWT_SECRET:DevOnlySecretPleaseChangeLocally}

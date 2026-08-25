@@ -28,7 +28,7 @@ spring.log
 application-local.yml
 application-dev.yml
 application-prod.yml
-application-test.yml
+!application-test.yml
 application-secrets.yml
 application-*.local.yml
 
