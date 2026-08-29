@@ -3,6 +3,7 @@ package com.garrettw011.orderflow.order;
 import com.garrettw011.orderflow.common.exception.ResourceNotFoundException;
 import com.garrettw011.orderflow.common.exception.DuplicateResourceException;
 import com.garrettw011.orderflow.common.idempotency.IdempotencyService;
+import com.garrettw011.orderflow.common.metrics.BusinessMetrics;
 import com.garrettw011.orderflow.customer.Customer;
 import com.garrettw011.orderflow.customer.CustomerService;
 import com.garrettw011.orderflow.order.dto.OrderCreateRequest;
@@ -22,30 +23,39 @@ public class OrderService {
     private final OrderRepository orders;
     private final CustomerService customerService;
     private final IdempotencyService idempotency;
+    private final BusinessMetrics metrics;
 
     public OrderService(RetryOrderCreator orderCreator, OrderCreationService creationService, OrderRepository orders,
-                        CustomerService customerService, IdempotencyService idempotency) {
+                        CustomerService customerService, IdempotencyService idempotency, BusinessMetrics metrics) {
         this.orderCreator = orderCreator;
         this.creationService = creationService;
         this.orders = orders;
         this.customerService = customerService;
         this.idempotency = idempotency;
+        this.metrics = metrics;
     }
 
     public OrderResponse placeOrder(Long userId, OrderCreateRequest req, @Nullable String idempotencyKey) {
-        if (idempotencyKey == null || idempotencyKey.isBlank()) { return orderCreator.create(userId, req); }
+        // null idempot key --> create new order
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            OrderResponse created = orderCreator.create(userId, req);
+            metrics.orderPlaced();
+            return created;
+        }
 
         String scope = "order:" + userId;
 
+        // idempot key --> check if previously seen
         Optional<String> existing = idempotency.find(scope, idempotencyKey);
         if (existing.isPresent()) {
             if (IdempotencyService.PROCESSING.equals(existing.get())) {
                 throw new DuplicateResourceException("Request is already in progress...");
             }
-            // return already created order
+            // replay --> no new order created, return previously created order
             return loadDetail(Long.valueOf(existing.get()));
         }
 
+        // new idempot key --> claim key + create new order
         if (!idempotency.claim(scope, idempotencyKey)) {
             throw new DuplicateResourceException("Request is already in progress...");
         }
@@ -53,6 +63,7 @@ public class OrderService {
         try {
             OrderResponse created = orderCreator.create(userId, req);
             idempotency.store(scope, idempotencyKey, String.valueOf(created.id()));
+            metrics.orderPlaced();
             return created;
         }
         catch (RuntimeException ex) {

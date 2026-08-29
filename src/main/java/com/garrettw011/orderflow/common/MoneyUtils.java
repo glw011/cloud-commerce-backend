@@ -8,12 +8,12 @@ import java.math.RoundingMode;
  */
 
 public final class MoneyUtils {
-    public static final int SCALE = 2;
-    public static final RoundingMode ROUNDING = RoundingMode.HALF_UP;
+    public static final int DECIMAL_DIGITS = 2;
+    public static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
 
     private MoneyUtils() {}
 
-    public static BigDecimal normalize(BigDecimal value) { return value.setScale(SCALE, ROUNDING); }
+    public static BigDecimal normalize(BigDecimal value) { return value.setScale(DECIMAL_DIGITS, ROUNDING_MODE); }
 
     public static BigDecimal lineTotal(BigDecimal unitPrice, int quantity) {
         return normalize(unitPrice.multiply(BigDecimal.valueOf(quantity)));

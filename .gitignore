@@ -28,7 +28,7 @@ spring.log
 application-local.yml
 application-dev.yml
 application-prod.yml
-application-test.yml
+!application-test.yml
 application-secrets.yml
 application-*.local.yml
 
@@ -80,6 +80,7 @@ jacoco.exec
 jacoco-ut.exec
 jacoco-it.exec
 .testcontainers.properties
+prodtest.sh
 
 # ===== OS =====
 .DS_Store

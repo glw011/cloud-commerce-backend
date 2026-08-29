@@ -140,26 +140,10 @@ class OrderApiTest extends AbstractIntegrationTest {
 
     @Test
     void idempotentRetryWontReserveTwice() throws Exception {
-        long pid = createStockedProduct("ORD-TST-P07", "10.00", 100);
         String key = "idem-key-qwe123";
-
-        String first = mvc.perform(post("/api/v1/orders")
-                        .header("Authorization", bearer(token()))
-                        .header("Idempotency-Key", key)
-                        .contentType(json)
-                        .content(orderBody(pid, 2)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        long firstId = ((Number) JsonPath.read(first, "$.id")).longValue();
-
-        String second = mvc.perform(post("/api/v1/orders")
-                        .header("Authorization", bearer(token()))
-                        .header("Idempotency-Key", key)
-                        .contentType(json)
-                        .content(orderBody(pid, 2)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        long secondId = ((Number) JsonPath.read(second, "$.id")).longValue();
+        long pid = createStockedProduct("ORD-TST-SAME-IDEM-KEY", "10.00", 100);
+        long firstId = orderIdWithKey(pid, key);
+        long secondId = orderIdWithKey(pid, key);
 
         // verify same order
         assertThat(secondId).isEqualTo(firstId);
@@ -168,6 +152,15 @@ class OrderApiTest extends AbstractIntegrationTest {
         mvc.perform(get("/api/v1/inventory/" + pid)
                         .header("Authorization", bearer(adminToken())))
                 .andExpect(jsonPath("$.quantityReserved").value(2));
+    }
+
+    @Test
+    void diffIdempotencyKeysCreateNewOrders() throws Exception {
+        long pid = createStockedProduct("ORD-TST-DIFF-IDEM-KEY", "10.00", 100);
+        long firstId = orderIdWithKey(pid, "key-number-one");
+        long secondId = orderIdWithKey(pid, "key-number-two");
+
+        assertThat(secondId).isNotEqualTo(firstId);
     }
 
     @Test
@@ -203,6 +196,17 @@ class OrderApiTest extends AbstractIntegrationTest {
         mvc.perform(get("/api/v1/inventory/" + pid).header("Authorization", bearer(adminToken())))
                 .andExpect(jsonPath("$.availableQuantity").value(0))
                 .andExpect(jsonPath("$.quantityReserved").value(1));
+    }
+
+    private long orderIdWithKey(long pid, String key) throws Exception {
+        String body = mvc.perform(post("/api/v1/orders")
+                        .header("Authorization", bearer(token()))
+                        .header("Idempotency-key", key)
+                        .contentType(json)
+                        .content(orderBody(pid, 2)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return ((Number) JsonPath.read(body, "$.id")).longValue();
     }
 }
 

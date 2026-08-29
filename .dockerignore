@@ -1,0 +1,9 @@
+# ignore by default
+*
+
+# allows needed for build
+!.mvn
+!mvnw
+!pom.xml
+!src
+!lombok.config

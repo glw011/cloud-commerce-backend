@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/orderflow}
     username: ${DB_USERNAME:orderflow}
@@ -16,17 +18,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env
+        include: health, info, metrics, env, prometheus
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized
 
 app:
   security:
     jwt:
-      issuer: orderflow
-      access-token-ttl: 15m
-      refresh-token-ttl: 7d
-
-      # 32 Byte (256 bit) secret
-      secret: ${JWT_SECRET:PleaseChangeDevOnlySecretLocally}
+      secret: ${JWT_SECRET:DevOnlySecretPleaseChangeLocally}
