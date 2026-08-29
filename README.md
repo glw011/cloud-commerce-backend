@@ -147,6 +147,8 @@ curl http://localhost:8080/actuator/health  # use separate terminal
 docker compose down
 ```
 
+<br/>
+
 ### Setup Instructions
 
 1. **Clone repository**:
@@ -175,18 +177,19 @@ docker compose down
    
    Local defaults work out-of-box or can be changed as desired
    
-   > [!NOTE] `application-local.yml` does not contain anything sensitive but an example file is used anyway as best practice 
+   > [!NOTE] 
+   > `application-local.yml` does not contain anything sensitive but an example file is used anyway as best practice 
    > to avoid accidental leaks of sensitive data that could potentially be added for local testing
 
    **OPTIONAL**: 
-   The `prod` Spring profile for this project is meant to mimic the requirements of a live production environment and 
-   unnecessary for local development or demo. 
+   The `prod` Spring profile for this project is meant to mimic the requirements of a live production environment but 
+   unnecessary for local development or a demo. 
     
-   However, if desired you can also copy '`application-prod.example.yml`' & create '`application-prod.yml`':
+   If desired you can also copy '`application-prod.example.yml`' & create '`application-prod.yml`':
    ```bash
    cp ./src/main/resources/application-prod.example.yml ./src/main/resources/application-prod.yml
    ```
-   Then use `prod` profile when starting the application:
+   Then use the `prod` profile when starting the application:
    ```bash
    ./mvnw spring-boot:run -P prod
    ```
