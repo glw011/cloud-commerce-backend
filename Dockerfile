@@ -15,15 +15,15 @@ FROM base AS development
 # copy lombok.config + source
 COPY lombok.config ./
 COPY src/ src/
-# run app in `local` spring profile
-CMD ./mvnw spring-boot:run -Dspring-boot.run.profiles=${SPRING_PROF}
+# run app in `local` spring profile as default
+CMD ["./mvnw", "spring-boot:run"]
 
 
 #   ===========    Test Stage    ===========
 FROM base AS test
 COPY lombok.config ./
 COPY src/ src/
-CMD ["./mvnw", "-B", "-ntp", "verify"]
+CMD ["./mvnw", "-B", "-ntp", "-DexcludedGroups=testcontainers", "verify"]
 
 
 #   ===========    Extract Layers/Build for Production   ===========
