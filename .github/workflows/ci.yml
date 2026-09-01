@@ -41,8 +41,13 @@ jobs:
     name: Compose stack test
     runs-on: ubuntu-latest
     env:
+      DB_NAME:
       DB_USERNAME: orderflow
       DB_PASSWORD: orderflow
+      POSTGRES_USER: orderflow
+      POSTGRES_PASSWORD: orderflow
+      REDIS_PORT: 6379
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     needs: build
     steps:
       - name: Code checkout

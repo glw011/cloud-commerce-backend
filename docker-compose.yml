@@ -66,7 +66,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: test
       ENABLE_TESTCONTAINERS: "false"
-      DB_NAME:
+      DB_NAME: orderflow_test
       DB_URL: jdbc:postgresql://test-postgres:5432/orderflow_test
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
