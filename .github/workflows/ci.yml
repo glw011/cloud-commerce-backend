@@ -11,7 +11,10 @@ permissions:
 
 jobs:
   build:
+    name: Tests (Testcontainers)
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     steps:
       - name: Code checkout
         uses: actions/checkout@v7
@@ -24,7 +27,7 @@ jobs:
           cache: maven
 
       - name: Build, test, & verify coverage
-        run: ./mvnw -B clean verify
+        run: ./mvnw -B -ntp clean verify
 
       - name: Publish coverage
         if: always()
@@ -33,3 +36,26 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
           if-no-files-found: warn
+
+  compose-stack:
+    name: Compose stack test
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: orderflow
+      DB_USERNAME: orderflow
+      DB_PASSWORD: orderflow
+      POSTGRES_USER: orderflow
+      POSTGRES_PASSWORD: orderflow
+      REDIS_PORT: 6379
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    needs: build
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v7
+
+      - name: Run compose stack test suite
+        run: docker compose --profile test run --build --rm test
+
+      - name: Tear down
+        if: always()
+        run: docker compose --profile test down -v
