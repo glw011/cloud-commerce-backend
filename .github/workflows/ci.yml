@@ -40,6 +40,9 @@ jobs:
   compose-stack:
     name: Compose stack test
     runs-on: ubuntu-latest
+    env:
+      DB_USERNAME: orderflow
+      DB_PASSWORD: orderflow
     needs: build
     steps:
       - name: Code checkout
