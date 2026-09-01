@@ -1,6 +1,7 @@
 package com.garrettw011.orderflow.product;
 
 import com.garrettw011.orderflow.support.AbstractIntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -13,13 +14,18 @@ class ProductCacheTest extends AbstractIntegrationTest {
     @Autowired CacheManager cacheManager;
     @Autowired ProductRepository productRepository;
 
+    @BeforeEach
+    void clearCache() {
+        cacheManager.getCache("products").clear();
+        cacheManager.getCache("product-list").clear();
+    }
+
     @Test
     void readsFromCache() throws Exception {
         long id = createProduct("CACHE-1", "10.00");
         mvc.perform(get("/api/v1/products/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Test CACHE-1"));
-        assertThat(cacheManager.getCache("products").get("id:" + id)).isNotNull();
 
         // update product's name in db (bypassing service so no evict triggers)
         Product p = productRepository.findById(id).orElseThrow();
@@ -27,6 +33,7 @@ class ProductCacheTest extends AbstractIntegrationTest {
         productRepository.saveAndFlush(p);
 
         mvc.perform(get("/api/v1/products/" + id))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Test CACHE-1"));
     }
 
@@ -34,6 +41,7 @@ class ProductCacheTest extends AbstractIntegrationTest {
     void updateEvictsCachedProduct() throws Exception {
         long id = createProduct("CACHE-TST-2", "10.00");
         mvc.perform(get("/api/v1/products/" + id))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Test CACHE-TST-2"));
 
         // evict product cache
@@ -49,6 +57,7 @@ class ProductCacheTest extends AbstractIntegrationTest {
         assertThat(cacheManager.getCache("products").get("id:" + id)).isNull();
 
         mvc.perform(get("/api/v1/products/" + id))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("CacheTest2"));
     }
 

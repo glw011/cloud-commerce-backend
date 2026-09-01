@@ -50,4 +50,4 @@ jobs:
 
       - name: Tear down
         if: always()
-        run: docker compose down --profile test down -v
+        run: docker compose --profile test down -v

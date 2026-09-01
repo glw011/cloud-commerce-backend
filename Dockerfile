@@ -23,7 +23,7 @@ CMD ["./mvnw", "spring-boot:run"]
 FROM base AS test
 COPY lombok.config ./
 COPY src/ src/
-CMD ["./mvnw", "-B", "-ntp", "-DexcludedGroups=testcontainers", "verify"]
+CMD ["./mvnw", "-B", "-ntp", "-DexcludedGroups=testcontainers", "clean", "verify"]
 
 
 #   ===========    Extract Layers/Build for Production   ===========
