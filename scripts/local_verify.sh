@@ -2,9 +2,14 @@
 
 set -euo pipefail
 
+# Scripts live in `/scripts/` so ensure it runs from project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
 # Warn/exit if .env does not exist
 if [ ! -f .env ]; then
-  echo "ERROR: No .env file found -- copy '.env.example' to '.env'" | tee >(cat >&2)
+  echo "ERROR: No .env file found -- copy '.env.example' to '.env'" >&2
   exit 1
 fi
 
@@ -18,7 +23,7 @@ JWT_SECRET="$(grep -E '^JWT_SECRET=' .env | tail -n1 | cut -d= -f2- || true)"
 
 # Warn/exit if JWT_SECRET is empty or missing from .env
 if [ -z "${JWT_SECRET:-}" ]; then
-  echo "ERROR: JWT_SECRET missing or empty in .env file" | tee >(cat >&2)
+  echo "ERROR: JWT_SECRET missing or empty in .env file" >&2
   exit 1
 fi
 

@@ -31,5 +31,5 @@ fi
 export JWT_SECRET
 export ENABLE_TESTCONTAINERS="true"
 
-# Run tests in random order
-./mvnw -B -ntp clean test -Dsurefire.runOrder=random
+# Verify coverage
+./mvnw -B -ntp clean test

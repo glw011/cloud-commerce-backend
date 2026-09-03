@@ -1,4 +1,4 @@
-.PHONY: check-env up down test test-compose verify logs wait help
+.PHONY: check-env up down reset test test-compose verify logs wait help
 
 check-env:
 	@test -f .env || { echo "ERROR: No .env file found -- copy .env.example to .env"; exit 1; }
@@ -16,7 +16,7 @@ check-env:
 	fi
 
 	@CURR_BUILD_TARGET="$$(grep -E '^BUILD_TARGET=' .env | tail -n1 | cut -d= -f2-)"; \
-	if [ -z "$$CURR_BUILD_TARGET" ]; then \
+	if [ -n "$$CURR_BUILD_TARGET" ]; then \
 	  echo "Current Build Target: $$CURR_BUILD_TARGET"; \
 	else \
 	  echo "WARN: BUILD_TARGET in .env file is unset or empty"; \
@@ -26,7 +26,9 @@ up: check-env
 	docker compose up --build app
 
 down:
-	docker compose stop app
+	docker compose down
+
+reset:
 	docker compose down -v
 
 wait:
@@ -36,7 +38,7 @@ test:
 	@test -f .env || { echo "ERROR: No .env file found -- copy .env.example to .env"; exit 1; }
 	@CURR_JWT_SECRET="$$(grep -E '^JWT_SECRET=' .env | tail -n1 | cut -d= -f2-)"; \
 	if [ -z "$$CURR_JWT_SECRET" ]; then \
-	  echo "WARN: SPRING_PROF in .env file is unset or empty"; exit 1; \
+	  echo "ERROR: JWT_SECRET in .env file is unset or empty"; exit 1; \
 	fi
 	JWT_SECRET=$$CURR_JWT_SECRET ENABLE_TESTCONTAINERS=true ./mvnw -B -ntp clean test
 
@@ -55,8 +57,9 @@ logs:
 
 help:
 	@echo "Available 'make' commands:"
-	@echo "  make up     - Runs 'docker compose up -d --build app' using vals from .env"
-	@echo "  make down   - Brings down Compose services via 'docker compose down -v'"
+	@echo "  make up     - Runs 'docker compose up --build app' using vals from .env"
+	@echo "  make down   - Brings down Compose services via 'docker compose down'"
+	@echo "  make reset  - Brings down Compose services & wipes dev volumes via 'docker compose down -v'"
 	@echo "  make verify - Verify JaCoCo coverage locally via './scripts/local_verify.sh'"
 	@echo "  make test   - Runs './mvnw clean test' using JWT_SECRET from .env & ENABLE_TESTCONTAINERS=true"
 	@echo "  make test-compose  - Runs Compose stack test with 'docker compose --profile test run --build --rm test' "

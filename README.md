@@ -2,26 +2,28 @@
 
 ![CI](https://github.com/glw011/cloud-commerce-backend/actions/workflows/ci.yml/badge.svg?branch=develop)
 
-### Project Goal: 
+## Project Summary:
 
-  Build a realistic backend platform demonstrating clean API design, DB modeling, transactions, authentication, caching, testing, cloud deployment, and documentation.
-
-### Project Summary:
-
-OrderFlow is a backend platform for small e-commerce operations aimed at providing administrative product management for businesses and customers using role-based access. 
+OrderFlow is a backend platform for small e-commerce operations aimed at providing administrative product management
+for businesses and customers using role-based access. 
 
 <div style="margin: 0 auto; width: max-content;">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="border: none;">
+<td style="width: 50%; vertical-align: top; border: none;">
 
-***Manages***:
+  ***Manages***:
 - Products and inventory
-- Customers 
+- Customers
 - Orders
 - Order items
 - Inventory reservations
 - Payments (currently simulated)
-- Order fulfillment status  
+- Order fulfillment status
+</td>
+<td style="width: 50%; vertical-align: top; border: none;">
 
-***Includes***:
+  ***Offers***:
 - Transaction safety
 - Inventory consistency
 - API validation
@@ -29,44 +31,38 @@ OrderFlow is a backend platform for small e-commerce operations aimed at providi
 - Authentication and authorization
 - Caching
 - Testing
-- Observability
-
+</td>
+</tr>
+</table>
 </div>
 
 ---
 
 <br>
 
-## Tech Stack
-
-<div style="margin: 0 auto; width: max-content;">
-
-**Core stack**: 
-  - _Language_: `Java 21` 
-  - _Framework_: `Spring Boot 4.1.0`
-  - _Build Tool_: `Maven` 
-  - _Database_: `PostgreSQL 16`
-  - _Migrations_: `Flyway` 
-  - _Cache_: `Redis 7`
-  - _Auth_: `Spring Security` + `JWT`
-  - _Local Dev_: `Docker Compose v2`
-  - _CI/CD_: `GitHub Actions`
-  - _Deployment_: `AWS ECS Fargate` 
-  - _Hosting_: `RDS PostgreSQL` 
-  - _Container Registry_: `ECR` 
-  - _Logs_: `CloudWatch Logs` 
-  - _Documentation_: `OpenAPI/Swagger` 
-  - _Metrics_: `Spring Boot Actuator`
-
-</div>
+## Tech
+- _Language_: `Java 21` 
+- _Framework_: `Spring Boot 4.1.0`
+- _Build Tool_: `Maven` 
+- _Database_: `PostgreSQL 16`
+- _Migrations_: `Flyway` 
+- _Cache_: `Redis 7`
+- _Auth_: `Spring Security` + `JWT`
+- _Local Dev_: `Docker Compose v2`
+- _CI/CD_: `GitHub Actions`
+- _Deployment_: `AWS ECS Fargate` 
+- _Managed DB_: `Amazon RDS (PostgreSQL 16)` 
+- _Managed Cache_: `Amazon ElastiCache (Redis 7)`
+- _Container Registry_: `ECR` 
+- _Logs_: `CloudWatch Logs` 
+- _Documentation_: `OpenAPI/Swagger` 
+- _Metrics_: `Spring Boot Actuator + Micrometer/Prometheus`
 
 ---
 
 <br>
 
-## Planned Architecture
-
-### System Architecture
+## System Architecture
 
 ```text
 Client/Postman/Swagger UI
@@ -85,7 +81,7 @@ Spring Boot REST API
         +--> Actuator Health Checks
 ```
 
-### Cloud Architecture
+## Cloud Architecture
 
 ```text
 Internet
@@ -100,21 +96,12 @@ ECS Fargate Service
    |
    +--> Amazon RDS PostgreSQL
    |
-   +--> containerized Redis
-   |
-   +--> Amazon S3
+   +--> Amazon ElastiCache Redis
    |
    +--> CloudWatch Logs
    |
-   +--> Secrets Manager/SSM Parameter Store
+   +--> Secrets Manager
 ```
-
----
-
-<br>
-
-## Planned Features
-_TBD_
 
 ---
 
@@ -130,118 +117,236 @@ _TBD_
     * Download: [Docker](https://docs.docker.com/compose/install/)
     * Verify: `docker compose version`
 
+<br>
+
 ### Quick Setup
-  From project root:
+There is a `setup.sh` script in the `/scripts` directory that will create the required `.env` and `.yml` config files...
 ```bash
-cp .env.example .env
-cp ./src/main/resources/application-local.example.yml ./src/main/resources/application-local.yml 
-docker compose up -d
-./mvnw spring-boot:run
-```
-  Confirm using a separate terminal:
-```bash
-curl http://localhost:8080/actuator/health  # use separate terminal
-```
-  To close when finished:
-```bash
-docker compose down
+./scripts/setup.sh
 ```
 
-<br/>
+<br>
+
+Or you can create them yourself using the example files...
+* Copy `.env.example` to `.env` in project root:
+  ```bash
+  cp .env.example .env
+  ```
+* Copy the example `.yml` files to create `application-local.yml` and `application-prod.yml` in `src/main/resources/`:
+  ```bash
+  cp ./src/main/resources/application-local.example.yml ./src/main/resources/application-local.yml \
+    && cp ./src/main/resources/application-prod.example.yml ./src/main/resources/application-prod.yml
+  ```
+
+Once the required files are created, to verify proper setup...
+* Start services:
+  ```bash
+  docker compose up -d --build app
+  ```
+* Confirm setup via health check endpoint:
+  ```bash
+  curl http://localhost:8080/actuator/health  # use separate terminal
+  ```
+* To stop:
+  ```bash
+  docker compose down
+  ```
+
+<br>
 
 ### Setup Instructions
 
 1. **Clone repository**:
    ```bash
-   git clone https://www.github.com/glw011/cloud-commerce-backend
+   git clone https://github.com/glw011/cloud-commerce-backend
    ```
    <br/>
 
-2. **Navigate to local project directory**:
+2. **Navigate to project directory**:
    ```bash
    cd /path/to/your/directory/   
    ```
    <br/>
 
-3. **Copy `.env.example` & create local `.env` file**:
+3. **Copy `.env.example` & create local `.env` file in project root**:
    ```bash
    cp .env.example .env 
    ```
+   > **NOTE**:
+   > The default values set for the environment variables in your `.env` file work out-of-box, but can be 
+   > changed as needed.
    
-   <br/>
+   <br>
+   
+   ***Environment variables in `.env`***:
+   - `DB_NAME`&emsp;&emsp;&emsp;>> &ensp; Name of PostgreSQL database connected to (also used to construct `DB_URL`)
+   - `DB_USERNAME`&ensp; >> &ensp; Username for PostgreSQL connection (also used by Postgres container's healthcheck)
+   - `DB_PASSWORD`&ensp; >> &ensp; Password for PostgreSQL connection
+   - `REDIS_PORT`&ensp;&ensp; >> &ensp; Port used to reach Redis (host set to `redis` service internally)
+   - `SPRING_PROF`&ensp; >> &ensp; Selects active Spring profile (`local` | `prod`)
+   - `BUILD_TARGET` >> &ensp; Selects Docker build stage for `app` service (`development` | `production`)
+   - `JWT_SECRET`&ensp;&ensp; >> &ensp; Secret key used to verify and sign JWTs - ***Must be at least 32 bytes***
 
-4. **Copy `application-local.example.yml` & create local `application-local.yml` file**:
+   <br>
+
+4. **Copy example config files at `src/main/resources/` to create `application-local.yml` & `application-prod.yml`**:
    ```bash
-   cp ./src/main/resources/application-local.example.yml ./src/main/resources/application-local.yml
+   cp ./src/main/resources/application-local.example.yml ./src/main/resources/application-local.yml \
+     && cp ./src/main/resources/application-prod.example.yml ./src/main/resources/application-prod.yml
    ```
-   
-   Local defaults work out-of-box or can be changed as desired
-   
+   While only one config file is needed, the file used is dependent on the value of `SPRING_PROF` in your `.env` file:
+     * &emsp;**- ***Default*** -**&emsp;`SPRING_PROF=local` &emsp; --> &emsp; `application-local.yml` &emsp; &emsp; 
+     * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;`SPRING_PROF=prod`&ensp;&emsp; --> &emsp; `application-prod.yml`
+ 
    > **NOTE**:  
-   > `application-local.yml` does not contain anything sensitive but an example file is used anyway as best practice 
-   > to avoid accidental leaks of sensitive data which could potentially be added for local testing
+   > `application-local.yml` and `application-prod.yml` are purposefully ignored by version control as a safeguard.
+   > By design, they should never contain anything sensitive and secrets should live in the `.env` file during dev work. 
+   > However, git-ignoring these files mitigates any risk of a careless edit leaking sensitive data.
 
-   <br/>
+   <br>
 
-5. **Start PostgreSQL and Redis**:
+5. **Start Services**:
    ```bash
-   docker compose up -d
+   docker compose up --build app
    ```
-   or
+   or if `GNU Make` is installed...
    ```bash
    make up
    ```
-   <br/>
+   <br>
 
-6. **Start application (using default local profile)**:
-   ```bash
-   ./mvnw spring-boot:run 
-   ```
-   or...
-   ```bash
-   make run 
-   ```
-   <br/>
-
-7. **Confirm successful setup (using a separate terminal)**:
+6. **Confirm setup was successful**:
 
    ```bash
-   curl http://localhost:8080/actuator/health 
+   curl -s http://localhost:8080/actuator/health 
    ```
-   <br/>
+   <br>
 
-8. **To stop application and services**:
+***To stop***:
    ```bash
    docker compose down 
    ```
-   <br/>
-
-** **Optional `prod` Spring Profile** **
-
-The `prod` Spring profile for this project is meant to mimic a live production environment but is completely
-unnecessary for local testing/development.
-
-_However_, if desired you can also copy the `application-prod.example.yml` & create the `application-prod.yml`
-that is needed for `prod`:
-   ```bash
-   cp ./src/main/resources/application-prod.example.yml ./src/main/resources/application-prod.yml
-   ```
-Then use the `prod` profile when starting the application:
-   ```bash
-   ./mvnw spring-boot:run -P prod
-   ```
-
 ---
 
 <br>
 
 ## Testing
+### Testing Within the Compose Stack
+***Start***:
+```bash
+docker compose --profile test run --build --rm test
+```
+<br>
+
+***Teardown***:
+
+To bring down entire stack...
+```bash
+docker compose --profile test down
+```
+For targeted cleanup of a previous test's resources...
+```bash
+docker compose rm -fs test-postgres
+```
+
+<br>
+
+***Make `test-compose` Command***:
+
+There is also a `make` command which handles the start/teardown and stores details locally in `test-compose.log`...
+```bash
+make test-compose
+```
+
+<br>
+
+### Local Development Testing
+The entire test suite can be run using `JWT_SECRET` from your `.env` file and Testcontainers for Redis/Postgres
+> **NOTE**:
+> These commands are meant to quickly verify test outcomes, however they do not enforce the JaCoCo coverage gate. See
+> the ***JaCoCo Coverage*** section below for verifying coverage.
+
+The test suite can be run without the JaCoCo coverage gate via the `local_test.sh` script...
+```bash
+./scripts/local_test.sh
+```
+
+<br>
+
+***Make `test` Command***:
+
+There is also a `make` command to run the test suite without the coverage gate...
+```bash
+make test
+```
+
+<br>
+
+***Targeted Testing***:
+
+You can also run individual tests by passing the desired test file(s) you'd like to run to the `local_test.sh` script...
+```bash
+./scripts/local_target_test.sh <test-file>
+```
+
+The `local_test.sh` script requires at least 1 valid test class as an argument, but can accept additional names 
+for running multiple test classes sequentially...
+```bash
+./scripts/local_target_test.sh <test-file-1> <opt-test-file-2> ...
+```
+
+<div style="margin: 0 auto; width: max-content;">
+
+***Valid Test Classes***:
+<table border="0" cellpadding="0" cellspacing="0">
+<tr style="border: none;">
+<td style="width: 33%; vertical-align: top; border: none;">
+  <li>CustomerApiTest</li>
+  <li>InventoryApiTest</li>
+  <li>OrderApiTest</li>
+  <li>ProductApiTest</li>
+  <li>ReportApiTest</li>
+</td>
+<td style="width: 33%; vertical-align: top; border: none;">
+  <li>InventoryRepositoryTest</li>
+  <li>ProductRepositoryTest</li>
+  <li>UserRepositoryTest</li>
+  <li>JwtFilterTest</li>
+  <li>ProductCacheTest</li>
+</td>
+  <td style="width: 33%; vertical-align: top; border: none;">
+  <li>AuthFlowTest</li>
+  <li>OrderWorkflowTest</li>
+  <li>ObservabilityTest</li>
+  <li>RefreshTokenRotationTest</li>
+</td>
+</tr>
+</table>
+</div>
+
+<br>
+
+***JaCoCo Coverage Gate***:
+
+The `local_verify.sh` script sets the necessary environment variables to the values in your `.env` file and
+then runs the entire test suite (using Testcontainers for Redis/Postgres) plus the JaCoCo coverage gate...
+```bash
+./scripts/local_verify.sh
+```
+Or you can use the `GNU Make` command...
+```bash
+make verify
+```
 
 ---
 
 <br>
 
 ## Deployment
+ECS Fargate + RDS + ElastiCache + ALB topology, secrets via Secrets Manager injected through task execution role, 
+image in ECR, structured logs in CloudWatch 
+
+> **NOTE**: Project is deployable but is currently torn down for cost savings
 
 ---
 
