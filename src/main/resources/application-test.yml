@@ -25,4 +25,4 @@ logging:
 app:
   security:
     jwt:
-      secret: ${JWT_SECRET:DevOnlySecretPleaseChangeLocally}
+      secret: ${JWT_SECRET}
